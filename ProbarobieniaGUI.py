@@ -11,6 +11,12 @@ import tkinter as tk
 import random
 from functools import partial
 
+
+
+SHIFTBETWEENCARDS = 8
+SHIFTADJUSTMENT = 1
+PADXBETWEENCARDNAMES = 20
+
 J=11
 Q=12
 K=13
@@ -65,7 +71,7 @@ def check_left_cards_in_deck():
 
 def show_cards_left_buttons():
     for i in range(0,len(cardsLeft),1):
-        buttonCal = tk.Button(MainWindow, text=cardsLeft[i], command=lambda:add(counterA)).grid(row=13, column=i)
+        buttonCal = tk.Button(MainWindow, text=cardsLeft[i], command=lambda:add(counterHA)).grid(row=13, column=i)
     return
 
 
@@ -112,12 +118,12 @@ DOUBLEPAIRA = SINGLEA * DOUBLEPAIRsingleMULTIPLIER
 
 
 def calculate_single_points(label_result):
-    suma = (counter9.get() * SINGLE9 
-    + counter10.get() * SINGLE10 
-    + counterJ.get() * SINGLEJ
-    + counterQ.get() * SINGLEQ
-    + counterK.get() * SINGLEK
-    + counterA.get() * SINGLEA)
+    suma = (counterH9.get() * SINGLE9 
+    + counterH10.get() * SINGLE10 
+    + counterHJ.get() * SINGLEJ
+    + counterHQ.get() * SINGLEQ
+    + counterHK.get() * SINGLEK
+    + counterHA.get() * SINGLEA)
     
     print(suma)
     label_result.config(text="Result from single points %d" %suma)
@@ -126,17 +132,17 @@ def calculate_single_points(label_result):
 
 def calculate_pair_points(label_result):
     pairsum = 0
-    if counter9.get() == 2:
+    if counterH9.get() == 2:
         pairsum = pairsum + PAIR9
-    if counter10.get() == 2:
+    if counterH10.get() == 2:
         pairsum = pairsum + PAIR10
-    if counterJ.get() == 2:
+    if counterHJ.get() == 2:
         pairsum = pairsum + PAIRJ
-    if counterQ.get() == 2:
+    if counterHQ.get() == 2:
         pairsum = pairsum + PAIRQ
-    if counterK.get() == 2:
+    if counterHK.get() == 2:
         pairsum = pairsum + PAIRK
-    if counterA.get() == 2:
+    if counterHA.get() == 2:
         pairsum = pairsum + PAIRA
         
         
@@ -149,17 +155,17 @@ def calculate_pair_points(label_result):
 
 def calculate_double_pair_points(label_result):
     doublepairsum = 0
-    if counter9.get() == 4:
+    if counterH9.get() == 4:
         doublepairsum = doublepairsum + DOUBLEPAIR9
-    if counter10.get() == 4:
+    if counterH10.get() == 4:
         doublepairsum = doublepairsum + DOUBLEPAIR10
-    if counterJ.get() == 4:
+    if counterHJ.get() == 4:
         doublepairsum = doublepairsum + DOUBLEPAIRJ
-    if counterQ.get() == 4:
+    if counterHQ.get() == 4:
         doublepairsum = doublepairsum + DOUBLEPAIRQ
-    if counterK.get() == 4:
+    if counterHK.get() == 4:
         doublepairsum = doublepairsum + DOUBLEPAIRK
-    if counterA.get() == 4:
+    if counterHA.get() == 4:
         doublepairsum = doublepairsum + DOUBLEPAIRA
         
         
@@ -219,7 +225,7 @@ def sub(intVariable):
     
 
 MainWindow = tk.Tk()
-MainWindow.geometry('600x400+100+200')
+MainWindow.geometry('1200x800')
 MainWindow.title('Advanced DSS card game calculator')
 number1 = tk.StringVar()
 
@@ -229,18 +235,77 @@ equation = tk.StringVar()
 x=tk.IntVar()
 
 
-############### AKTUALNA LICZBA KART
-counter9=tk.IntVar()
-counter10=tk.IntVar()
-counterJ=tk.IntVar()
-counterQ=tk.IntVar()
-counterK=tk.IntVar()
-counterA=tk.IntVar()
-
-box_counter = [counter9, counter10, counterJ, counterQ, counterK, counterA]
+############### LICZNIKI AKTUALNA LICZBA KART HEARTS $$$$$$$$$$$$$$$$$$
+counterH9=tk.IntVar()
+counterH10=tk.IntVar()
+counterHJ=tk.IntVar()
+counterHQ=tk.IntVar()
+counterHK=tk.IntVar()
+counterHA=tk.IntVar()
 
 
-## tekst na ekranie oznaczenia kart
+
+
+############### LICZNIKI AKTUALNA LICZBA KART TILES $$$$$$$$$$$$$$$$$$
+counterT9=tk.IntVar()
+counterT10=tk.IntVar()
+counterTJ=tk.IntVar()
+counterTQ=tk.IntVar()
+counterTK=tk.IntVar()
+counterTA=tk.IntVar()
+
+
+
+############### LICZNIKI AKTUALNA LICZBA KART CLOVERS &&&&&&&&&&&&&&&&&&&&&
+counterC9=tk.IntVar()
+counterC10=tk.IntVar()
+counterCJ=tk.IntVar()
+counterCQ=tk.IntVar()
+counterCK=tk.IntVar()
+counterCA=tk.IntVar()
+
+
+
+
+############### LICZNIKI AKTUALNA LICZBA KART PIKES *********************8
+counterP9=tk.IntVar()
+counterP10=tk.IntVar()
+counterPJ=tk.IntVar()
+counterPQ=tk.IntVar()
+counterPK=tk.IntVar()
+counterPA=tk.IntVar()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+box_counter = [counterH9, counterH10, counterHJ, counterHQ, counterHK, counterHA]
+
+
+## tekst na ekranie oznaczenia kart HEARTS $$$$$$$$$$$$$$$$$$$
 
 labelTitle = tk.Label(MainWindow, text="Hearts").grid(row=0, column=2)
 
@@ -248,22 +313,110 @@ labelTitle = tk.Label(MainWindow, text="Hearts").grid(row=0, column=2)
 labelNum9 = tk.Label(MainWindow, text="9").grid(row=1, column=0)
 nineEntry = tk.Entry(MainWindow)
 
-
-
 labelNum10 = tk.Label(MainWindow, text="10").grid(row=2, column=0)
-tebEntry = tk.Entry(MainWindow)
+HtenEntry = tk.Entry(MainWindow)
 
 labelNumJ = tk.Label(MainWindow, text="J").grid(row=3, column=0)
-jackEntry = tk.Entry(MainWindow)
+HjackEntry = tk.Entry(MainWindow)
 
 labelNumQ = tk.Label(MainWindow, text="Q").grid(row=4, column=0)
-quuenEntry = tk.Entry(MainWindow)
+HquuenEntry = tk.Entry(MainWindow)
 
 labelNumK = tk.Label(MainWindow, text="K").grid(row=5, column=0)
-kingEntry = tk.Entry(MainWindow)
+HkingEntry = tk.Entry(MainWindow)
 
 labelNumA = tk.Label(MainWindow, text="A").grid(row=6, column=0)
-aceEntry = tk.Entry(MainWindow)
+HaceEntry = tk.Entry(MainWindow)
+
+
+##############################
+
+
+
+
+## tekst na ekranie oznaczenia kart TILES ^^^^^^^^^^^^^^^^^^
+
+labelTitle = tk.Label(MainWindow, text="TILES").grid(row=0, column=2 + SHIFTBETWEENCARDS)
+
+
+labelNum9 = tk.Label(MainWindow, text="9").grid(row=1, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
+TnineEntry = tk.Entry(MainWindow)
+
+labelNum10 = tk.Label(MainWindow, text="10").grid(row=2, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES )
+TtenEntry = tk.Entry(MainWindow)
+
+labelNumJ = tk.Label(MainWindow, text="J").grid(row=3, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES) 
+TjackEntry = tk.Entry(MainWindow)
+
+labelNumQ = tk.Label(MainWindow, text="Q").grid(row=4, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
+TquuenEntry = tk.Entry(MainWindow)
+
+labelNumK = tk.Label(MainWindow, text="K").grid(row=5, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
+TkingEntry = tk.Entry(MainWindow)
+
+labelNumA = tk.Label(MainWindow, text="A").grid(row=6, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
+TaceEntry = tk.Entry(MainWindow)
+
+
+##############################
+
+
+
+
+
+
+## tekst na ekranie oznaczenia kart CLOVERS &&&&&&&&&&&&&&&&&&&
+
+labelTitle = tk.Label(MainWindow, text="CLOVERS").grid(row=0, column=2 + SHIFTBETWEENCARDS * 2)
+
+
+labelNum9 = tk.Label(MainWindow, text="9").grid(row=1, column=0 + SHIFTBETWEENCARDS * 2 + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
+CnineEntry = tk.Entry(MainWindow)
+
+labelNum10 = tk.Label(MainWindow, text="10").grid(row=2, column=0 + SHIFTBETWEENCARDS * 2 + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
+CtenEntry = tk.Entry(MainWindow)
+
+labelNumJ = tk.Label(MainWindow, text="J").grid(row=3, column=0 + SHIFTBETWEENCARDS * 2 + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES) 
+CjackEntry = tk.Entry(MainWindow)
+
+labelNumQ = tk.Label(MainWindow, text="Q").grid(row=4, column=0 + SHIFTBETWEENCARDS * 2 + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
+CquuenEntry = tk.Entry(MainWindow)
+
+labelNumK = tk.Label(MainWindow, text="K").grid(row=5, column=0 + SHIFTBETWEENCARDS * 2 + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
+CkingEntry = tk.Entry(MainWindow)
+
+labelNumA = tk.Label(MainWindow, text="A").grid(row=6, column=0 + SHIFTBETWEENCARDS * 2 + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
+CaceEntry = tk.Entry(MainWindow)
+
+
+##############################
+
+
+
+## tekst na ekranie oznaczenia kart PIKES **********************
+
+labelTitle = tk.Label(MainWindow, text="PIKES").grid(row=0, column=2 + SHIFTBETWEENCARDS * 3)
+
+
+labelNum9 = tk.Label(MainWindow, text="9").grid(row=1, column=0 + SHIFTBETWEENCARDS * 3 + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
+nineEntry = tk.Entry(MainWindow)
+
+
+
+labelNum10 = tk.Label(MainWindow, text="10").grid(row=2, column=0 + SHIFTBETWEENCARDS * 3 + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
+CtenEntry = tk.Entry(MainWindow)
+
+labelNumJ = tk.Label(MainWindow, text="J").grid(row=3, column=0 + SHIFTBETWEENCARDS * 3 + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES) 
+CjackEntry = tk.Entry(MainWindow)
+
+labelNumQ = tk.Label(MainWindow, text="Q").grid(row=4, column=0 + SHIFTBETWEENCARDS * 3 + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
+CquuenEntry = tk.Entry(MainWindow)
+
+labelNumK = tk.Label(MainWindow, text="K").grid(row=5, column=0 + SHIFTBETWEENCARDS * 3 + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
+CkingEntry = tk.Entry(MainWindow)
+
+labelNumA = tk.Label(MainWindow, text="A").grid(row=6, column=0 + SHIFTBETWEENCARDS * 3 + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
+CaceEntry = tk.Entry(MainWindow)
 
 
 ##############################
@@ -275,6 +428,201 @@ aceEntry = tk.Entry(MainWindow)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+## pasek do wpisywania zmiennych HEARTS $$$$$$$$$$$$
+
+entryNumH9 = tk.Entry(MainWindow, textvariable=counterH9, width = 4).grid(row=1, column=2)
+entryNumH10 = tk.Entry(MainWindow, textvariable=counterH10, width = 4).grid(row=2, column=2)
+entryNumHJ = tk.Entry(MainWindow, textvariable=counterHJ, width = 4).grid(row=3, column=2)
+entryNumHQ = tk.Entry(MainWindow, textvariable=counterHQ, width = 4).grid(row=4, column=2)
+entryNumHK = tk.Entry(MainWindow, textvariable=counterHK, width = 4).grid(row=5, column=2)
+entryNumHA = tk.Entry(MainWindow, textvariable=counterHA, width = 4).grid(row=6, column=2)
+
+
+##
+
+
+## pasek do wpisywania zmiennych TILES ^^^^^^^^^^^^^^^^^
+
+entryNumT9 = tk.Entry(MainWindow, textvariable=counterT9, width = 4).grid(row=1, column=2 + SHIFTBETWEENCARDS)
+entryNumT10 = tk.Entry(MainWindow, textvariable=counterT10, width = 4).grid(row=2, column=2 + SHIFTBETWEENCARDS)
+entryNumTJ = tk.Entry(MainWindow, textvariable=counterTJ, width = 4).grid(row=3, column=2 + SHIFTBETWEENCARDS)
+entryNumTQ = tk.Entry(MainWindow, textvariable=counterTQ, width = 4).grid(row=4, column=2 + SHIFTBETWEENCARDS)
+entryNumTK = tk.Entry(MainWindow, textvariable=counterTK, width = 4).grid(row=5, column=2 + SHIFTBETWEENCARDS)
+entryNumTA = tk.Entry(MainWindow, textvariable=counterTA, width = 4).grid(row=6, column=2 + SHIFTBETWEENCARDS)
+
+
+##
+
+
+
+## pasek do wpisywania zmiennych CLOVERS &&&&&&&&&&&&&&&&&&&
+
+entryNumC9 = tk.Entry(MainWindow, textvariable=counterC9, width = 4).grid(row=1, column=2 + SHIFTBETWEENCARDS * 2)
+entryNumC10 = tk.Entry(MainWindow, textvariable=counterC10, width = 4).grid(row=2, column=2 + SHIFTBETWEENCARDS * 2)
+entryNumCJ = tk.Entry(MainWindow, textvariable=counterCJ, width = 4).grid(row=3, column=2 + SHIFTBETWEENCARDS * 2)
+entryNumCQ = tk.Entry(MainWindow, textvariable=counterCQ, width = 4).grid(row=4, column=2 + SHIFTBETWEENCARDS * 2)
+entryNumCK = tk.Entry(MainWindow, textvariable=counterCK, width = 4).grid(row=5, column=2 + SHIFTBETWEENCARDS * 2)
+entryNumCA = tk.Entry(MainWindow, textvariable=counterCA, width = 4).grid(row=6, column=2 + SHIFTBETWEENCARDS * 2)
+
+
+##
+
+
+
+## pasek do wpisywania zmiennych PIKES **********************
+
+entryNumP9 = tk.Entry(MainWindow, textvariable=counterP9, width = 4).grid(row=1, column=2 + SHIFTBETWEENCARDS * 3)
+entryNumP10 = tk.Entry(MainWindow, textvariable=counterP10, width = 4).grid(row=2, column=2 + SHIFTBETWEENCARDS * 3)
+entryNumPJ = tk.Entry(MainWindow, textvariable=counterPJ, width = 4).grid(row=3, column=2 + SHIFTBETWEENCARDS * 3)
+entryNumPQ = tk.Entry(MainWindow, textvariable=counterPQ, width = 4).grid(row=4, column=2 + SHIFTBETWEENCARDS * 3)
+entryNumPK = tk.Entry(MainWindow, textvariable=counterPK, width = 4).grid(row=5, column=2 + SHIFTBETWEENCARDS * 3)
+entryNumPA = tk.Entry(MainWindow, textvariable=counterPA, width = 4).grid(row=6, column=2 + SHIFTBETWEENCARDS * 3)
+
+
+##
+
+
+
+
+
+
+
+
+
+##### PRZYCISKI do zmiany wartosci HEARTS $$$$$$$$$$$$$$$$$$$$$
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterH9)).grid(row=1, column=3)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterH9)).grid(row=1, column=4)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterH10)).grid(row=2, column=3)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterH10)).grid(row=2, column=4)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterHJ)).grid(row=3, column=3)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterHJ)).grid(row=3, column=4)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterHQ)).grid(row=4, column=3)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterHQ)).grid(row=4, column=4)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterHK)).grid(row=5, column=3)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterHK)).grid(row=5, column=4)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterHA)).grid(row=6, column=3)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterHA)).grid(row=6, column=4)
+
+
+
+#######
+
+
+##### PRZYCISKI do zmiany wartosci TILES ^^^^^^^^^^^^^^^^^^^^^^^^
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterT9)).grid(row=1, column=3 + SHIFTBETWEENCARDS)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterT9)).grid(row=1, column=4 + SHIFTBETWEENCARDS)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterT10)).grid(row=2, column=3 + SHIFTBETWEENCARDS)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterT10)).grid(row=2, column=4 + SHIFTBETWEENCARDS)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterTJ)).grid(row=3, column=3 + SHIFTBETWEENCARDS)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterTJ)).grid(row=3, column=4 + SHIFTBETWEENCARDS)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterTQ)).grid(row=4, column=3 + SHIFTBETWEENCARDS)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterTQ)).grid(row=4, column=4 + SHIFTBETWEENCARDS)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterTK)).grid(row=5, column=3 + SHIFTBETWEENCARDS)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterTK)).grid(row=5, column=4 + SHIFTBETWEENCARDS)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterTA)).grid(row=6, column=3 + SHIFTBETWEENCARDS)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterTA)).grid(row=6, column=4 + SHIFTBETWEENCARDS)
+
+
+
+##### PRZYCISKI do zmiany wartosci CLOVERS &&&&&&&&&&&&&&&&&&&&&&&
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterC9)).grid(row=1, column=3 + SHIFTBETWEENCARDS * 2)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterC9)).grid(row=1, column=4 + SHIFTBETWEENCARDS * 2)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterC10)).grid(row=2, column=3 + SHIFTBETWEENCARDS * 2)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterC10)).grid(row=2, column=4 + SHIFTBETWEENCARDS * 2)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterCJ)).grid(row=3, column=3 + SHIFTBETWEENCARDS * 2)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterCJ)).grid(row=3, column=4 + SHIFTBETWEENCARDS * 2)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterCQ)).grid(row=4, column=3 + SHIFTBETWEENCARDS * 2)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterCQ)).grid(row=4, column=4 + SHIFTBETWEENCARDS * 2)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterCK)).grid(row=5, column=3 + SHIFTBETWEENCARDS * 2)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterCK)).grid(row=5, column=4 + SHIFTBETWEENCARDS * 2)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterCA)).grid(row=6, column=3 + SHIFTBETWEENCARDS * 2)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterCA)).grid(row=6, column=4 + SHIFTBETWEENCARDS * 2)
+
+
+
+
+##### PRZYCISKI do zmiany wartosci PIKES **************************
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterP9)).grid(row=1, column=3 + SHIFTBETWEENCARDS * 3)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterP9)).grid(row=1, column=4 + SHIFTBETWEENCARDS * 3)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterP10)).grid(row=2, column=3 + SHIFTBETWEENCARDS * 3)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterP10)).grid(row=2, column=4 + SHIFTBETWEENCARDS * 3)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterPJ)).grid(row=3, column=3 + SHIFTBETWEENCARDS * 3)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterPJ)).grid(row=3, column=4 + SHIFTBETWEENCARDS * 3)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterPQ)).grid(row=4, column=3 + SHIFTBETWEENCARDS * 3)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterPQ)).grid(row=4, column=4 + SHIFTBETWEENCARDS * 3)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterPK)).grid(row=5, column=3 + SHIFTBETWEENCARDS * 3)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterPK)).grid(row=5, column=4 + SHIFTBETWEENCARDS * 3)
+
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterPA)).grid(row=6, column=3 + SHIFTBETWEENCARDS * 3)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterPA)).grid(row=6, column=4 + SHIFTBETWEENCARDS * 3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########### PRZYCISKI ZWIAZANE Z LOGIKA I PUNKTACJA
+
+
+
+buttonCal = tk.Button(MainWindow, text="single", command=calculate_single_points).grid(row=9, column=0)
+
+buttonCal = tk.Button(MainWindow, text="pair", command=calculate_pair_points).grid(row=9, column=3)
+
+
+buttonCal = tk.Button(MainWindow, text="doublepair", command=calculate_double_pair_points).grid(row=9, column=10)
+
+
+buttonCal = tk.Button(MainWindow, text="checkcard", command=check_left_cards_in_deck).grid(row=11, column=10)
+
+buttonCal = tk.Button(MainWindow, text="Show left cards", command=show_cards_left_buttons).grid(row=11, column=14)
+
+
+#######
 
 
 ##### wynik pod buttonami
@@ -296,17 +644,7 @@ label.grid(row=8, column=0)
 
 
 
-## pasek do wpisywania zmiennych
 
-entryNum9 = tk.Entry(MainWindow, textvariable=counter9).grid(row=1, column=2)
-entryNum10 = tk.Entry(MainWindow, textvariable=counter10).grid(row=2, column=2)
-entryNumJ = tk.Entry(MainWindow, textvariable=counterJ).grid(row=3, column=2)
-entryNumQ = tk.Entry(MainWindow, textvariable=counterQ).grid(row=4, column=2)
-entryNumK = tk.Entry(MainWindow, textvariable=counterK).grid(row=5, column=2)
-entryNumA = tk.Entry(MainWindow, textvariable=counterA).grid(row=6, column=2)
-
-
-##
 
 
 
@@ -328,40 +666,20 @@ calculate_double_pair_points = partial(calculate_double_pair_points, doublepairR
 #     add[karta]=partial(add,karta)
 #     print(karta)
 # add=partial(add,x)
-##### PRZYCISKI do zmiany wartosci
-
-buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counter9)).grid(row=1, column=3)
-buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counter9)).grid(row=1, column=4)
-
-buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counter10)).grid(row=2, column=3)
-buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counter10)).grid(row=2, column=4)
-
-buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterJ)).grid(row=3, column=3)
-buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterJ)).grid(row=3, column=4)
-
-buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterQ)).grid(row=4, column=3)
-buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterQ)).grid(row=4, column=4)
-
-buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterK)).grid(row=5, column=3)
-buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterK)).grid(row=5, column=4)
-
-buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterA)).grid(row=6, column=3)
-buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterA)).grid(row=6, column=4)
-
-buttonCal = tk.Button(MainWindow, text="single", command=calculate_single_points).grid(row=9, column=5)
-
-buttonCal = tk.Button(MainWindow, text="pair", command=calculate_pair_points).grid(row=9, column=7)
 
 
-buttonCal = tk.Button(MainWindow, text="doublepair", command=calculate_double_pair_points).grid(row=9, column=8)
 
 
-buttonCal = tk.Button(MainWindow, text="checkcard", command=check_left_cards_in_deck).grid(row=11, column=8)
-
-buttonCal = tk.Button(MainWindow, text="Show left cards", command=show_cards_left_buttons).grid(row=11, column=9)
 
 
-#######
+
+
+
+
+
+
+
+
 
 
 
