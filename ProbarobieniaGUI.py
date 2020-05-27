@@ -598,30 +598,6 @@ buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterPA)).grid(
 
 
 
-
-
-
-
-
-
-
-########### PRZYCISKI ZWIAZANE Z LOGIKA I PUNKTACJA
-
-
-
-buttonCal = tk.Button(MainWindow, text="single", command=calculate_single_points).grid(row=9, column=0)
-
-buttonCal = tk.Button(MainWindow, text="pair", command=calculate_pair_points).grid(row=9, column=3)
-
-
-buttonCal = tk.Button(MainWindow, text="doublepair", command=calculate_double_pair_points).grid(row=9, column=10)
-
-
-buttonCal = tk.Button(MainWindow, text="checkcard", command=check_left_cards_in_deck).grid(row=11, column=10)
-
-buttonCal = tk.Button(MainWindow, text="Show left cards", command=show_cards_left_buttons).grid(row=11, column=14)
-
-
 #######
 
 
@@ -649,7 +625,7 @@ label.grid(row=8, column=0)
 
 
 
-### funkcje liczone przez partial
+### funkcje liczone przez partial musza byc przed buttonami!!!!!!!!!!!!!
 
 call_result = partial(call_result, singleResultLabel, number1)
 substract_one = partial(substract_one, singleResultLabel, equation)
@@ -667,6 +643,45 @@ calculate_double_pair_points = partial(calculate_double_pair_points, doublepairR
 #     print(karta)
 # add=partial(add,x)
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########### PRZYCISKI ZWIAZANE Z LOGIKA I PUNKTACJA
+
+
+
+buttonCal = tk.Button(MainWindow, text="single", command=calculate_single_points).grid(row=9, column=0)
+
+buttonCal = tk.Button(MainWindow, text="pair", command=calculate_pair_points).grid(row=9, column=3)
+
+
+buttonCal = tk.Button(MainWindow, text="doublepair", command=calculate_double_pair_points).grid(row=9, column=10)
+
+
+buttonCal = tk.Button(MainWindow, text="checkcard", command=check_left_cards_in_deck).grid(row=11, column=10)
+
+buttonCal = tk.Button(MainWindow, text="Show left cards", command=show_cards_left_buttons).grid(row=11, column=14)
 
 
 
