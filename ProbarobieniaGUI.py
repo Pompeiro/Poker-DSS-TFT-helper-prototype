@@ -17,15 +17,33 @@ SHIFTBETWEENCARDS = 8
 SHIFTADJUSTMENT = 1
 PADXBETWEENCARDNAMES = 20
 
+
+RANDOMLYPICKEDCARDCOUNTER = 0
+
+
 J=11
 Q=12
 K=13
 A=14
 
 
-CARDDICT = {"9":"9", "10":"10", "J":"J", "Q":"Q", "K":"K", "A":"A"}
+
+############### PREPARING CARDS IN DECK CARDS TO REMOVE ETC
+
+#### HEARTS $$$$$$$$$ THEN TILES ^^^^^^^^^^^^ THEN CLOVERS &&&&&&&&& THEN PINKES ***********
+
+#### MEABY I WILL CHANGE VALUES IN THE FUTURE
 
 
+CARDDICTH = {"H9":"H9", "H10":"H10", "HJ":"HJ", "HQ":"HQ", "HK":"HK", "HA":"HA"}
+
+CARDDICTT = {"T9":"T9", "T10":"T10", "TJ":"TJ", "TQ":"TQ", "TK":"TK", "TA":"TA"}
+
+
+CARDDICTC = {"C9":"C9", "C10":"C10", "CJ":"CJ", "CQ":"CQ", "CK":"CK", "CA":"CA"}
+
+
+CARDDICTP = {"P9":"P9", "P10":"P10", "PJ":"PJ", "PQ":"PQ", "PK":"PK", "PA":"PA"}
 
 
 LISTAKART = [9, 10, J, Q, K, A]
@@ -34,7 +52,10 @@ LISTAKART = [9, 10, J, Q, K, A]
 
 
 ######################## FULL DECK
-FULLDECK = [CARDDICT["9"], CARDDICT["10"], CARDDICT["J"], CARDDICT["Q"], CARDDICT["K"], CARDDICT["A"]]
+FULLDECK = [CARDDICTH["H9"], CARDDICTH["H10"], CARDDICTH["HJ"], CARDDICTH["HQ"], CARDDICTH["HK"], CARDDICTH["HA"],
+            CARDDICTT["T9"], CARDDICTT["T10"], CARDDICTT["TJ"], CARDDICTT["TQ"], CARDDICTT["TK"], CARDDICTT["TA"],
+            CARDDICTC["C9"], CARDDICTC["C10"], CARDDICTC["CJ"], CARDDICTC["CQ"], CARDDICTC["CK"], CARDDICTC["CA"],
+            CARDDICTP["P9"], CARDDICTP["P10"], CARDDICTP["PJ"], CARDDICTP["PQ"], CARDDICTP["PK"], CARDDICTP["PA"]]
 
 ####### CHECK CARDS ON TABLE AND EVALUATE CARDS LEFT IN DECK
 
@@ -44,7 +65,7 @@ cardsToRemove = []
 
 cardsLeftString = []
 
-def check_left_cards_in_deck():
+def check_left_cards_in_deck(cardsLeft):
     for i in range(0,len(box_counter),1):
         if box_counter[i].get() == 1:
 #            print(cardsLeft[i])
@@ -69,13 +90,19 @@ def check_left_cards_in_deck():
 #     return cardsLeftString
 
 
-def show_cards_left_buttons():
+def show_cards_left_buttons(cardsLeft):
     for i in range(0,len(cardsLeft),1):
-        buttonCal = tk.Button(MainWindow, text=cardsLeft[i], command=lambda:add(counterHA)).grid(row=13, column=i)
+        select_counter(cardsLeft[i])
+        buttonCal = tk.Button(MainWindow, text=cardsLeft[i], command=lambda i = i:add(select_counter(cardsLeft[i]))).grid(row=13, column=i)
     return
 
 
-
+def pick_random_card_from_left_cards(cardsLeft):
+    global RANDOMLYPICKEDCARDCOUNTER
+    RANDOMLYPICKEDCARDCOUNTER =  RANDOMLYPICKEDCARDCOUNTER + 1
+    Random_card_from_left_cards = cardsLeft[random.randint(0, (len(cardsLeft)-1))]
+    buttonCal = tk.Button(MainWindow, text=Random_card_from_left_cards, command=lambda:add(select_counter(Random_card_from_left_cards))).grid(row=15, column=RANDOMLYPICKEDCARDCOUNTER)
+    return
 
 
 
@@ -279,6 +306,28 @@ counterPA=tk.IntVar()
 
 
 
+###################### DICT TO PUT COUNTERS INTO FOR LOOP IN SHOW_LEFT_CARDS()
+
+
+lookup = {CARDDICTH["H9"]: counterH9, CARDDICTH["H10"]: counterH10, CARDDICTH["HJ"]: counterHJ,
+          CARDDICTH["HQ"]: counterHQ, CARDDICTH["HK"]: counterHK, CARDDICTH["HA"]: counterHA,
+          
+          CARDDICTT["T9"]: counterT9, CARDDICTT["T10"]: counterT10, CARDDICTT["TJ"]: counterTJ,
+          CARDDICTT["TQ"]: counterTQ, CARDDICTT["TK"]: counterTK, CARDDICTT["TA"]: counterTA,
+          
+          CARDDICTC["C9"]: counterC9, CARDDICTC["C10"]: counterC10, CARDDICTC["CJ"]: counterCJ,
+          CARDDICTC["CQ"]: counterCQ, CARDDICTC["CK"]: counterCK, CARDDICTC["CA"]: counterCA,
+          
+          CARDDICTP["P9"]: counterP9, CARDDICTP["P10"]: counterP10, CARDDICTP["PJ"]: counterPJ,
+          CARDDICTP["PQ"]: counterPQ, CARDDICTP["PK"]: counterPK, CARDDICTP["PA"]: counterPA,}
+
+def select_counter(cardleft): ### like cardleft convert to counter
+    # print("Card left input to select counter is:", cardleft)
+    obj = lookup.get(cardleft)
+    if obj:
+        # print("Output is:", obj)
+        return obj
+    
 
 
 
@@ -299,10 +348,10 @@ counterPA=tk.IntVar()
 
 
 
-
-
-
-box_counter = [counterH9, counterH10, counterHJ, counterHQ, counterHK, counterHA]
+box_counter = [counterH9, counterH10, counterHJ, counterHQ, counterHK, counterHA,
+               counterT9, counterT10, counterTJ, counterTQ, counterTK, counterTA,
+               counterC9, counterC10, counterCJ, counterCQ, counterCK, counterCA,
+               counterP9, counterP10, counterPJ, counterPQ, counterPK, counterPA,]
 
 
 ## tekst na ekranie oznaczenia kart HEARTS $$$$$$$$$$$$$$$$$$$
@@ -637,6 +686,12 @@ calculate_pair_points = partial(calculate_pair_points, pairResultLabel)
 
 calculate_double_pair_points = partial(calculate_double_pair_points, doublepairResultLabel)
 
+show_cards_left_buttons = partial(show_cards_left_buttons, cardsLeft)
+
+
+check_left_cards_in_deck = partial(check_left_cards_in_deck, cardsLeft)
+
+pick_random_card_from_left_cards = partial(pick_random_card_from_left_cards, cardsLeft)
 
 # for karta in LISTAKART:
 #     add[karta]=partial(add,karta)
@@ -685,6 +740,7 @@ buttonCal = tk.Button(MainWindow, text="Show left cards", command=show_cards_lef
 
 
 
+buttonCal = tk.Button(MainWindow, text="Pick random card", command=pick_random_card_from_left_cards).grid(row=11, column=17)
 
 
 
