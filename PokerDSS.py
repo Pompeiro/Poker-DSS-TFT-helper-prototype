@@ -355,65 +355,12 @@ def pick_random_card_from_left_cards(cardsLeft):
 
 
 
-
-#############3 POINTS
-SINGLE9 = 10
-SINGLE10 = 20
-SINGLEJ = 30
-SINGLEQ = 40
-SINGLEK = 50
-SINGLEA = 60
-
-SINGLE_MULTIPLIER_LIST = [SINGLE9, SINGLE10, SINGLEJ, SINGLEQ, SINGLEK, SINGLEA]
+PAIRPOINTS = 500
 
 
-############## PAIR POINTS
+DOUBLEPAIRPOINTS = 1500
 
-PAIRsingleMULTIPLIER = 20
-
-PAIR9 = SINGLE9 * PAIRsingleMULTIPLIER
-PAIR10 = SINGLE10 * PAIRsingleMULTIPLIER
-PAIRJ = SINGLEJ * PAIRsingleMULTIPLIER
-PAIRQ = SINGLEQ * PAIRsingleMULTIPLIER
-PAIRK = SINGLEK * PAIRsingleMULTIPLIER
-PAIRA = SINGLEA * PAIRsingleMULTIPLIER
-
-
-PAIR_MULTIPLIER_LIST = [PAIR9, PAIR10, PAIRJ, PAIRQ, PAIRK, PAIRA]
-
-
-######### Double pair points
-
-DOUBLEPAIRsingleMULTIPLIER = 20
-
-DOUBLEPAIR9 = SINGLE9 * DOUBLEPAIRsingleMULTIPLIER
-DOUBLEPAIR10 = SINGLE10 * DOUBLEPAIRsingleMULTIPLIER
-DOUBLEPAIRJ = SINGLEJ * DOUBLEPAIRsingleMULTIPLIER
-DOUBLEPAIRQ = SINGLEQ * DOUBLEPAIRsingleMULTIPLIER
-DOUBLEPAIRK = SINGLEK * DOUBLEPAIRsingleMULTIPLIER
-DOUBLEPAIRA = SINGLEA * DOUBLEPAIRsingleMULTIPLIER
-
-DOUBLEPAIR_MULTIPLIER_LIST = [DOUBLEPAIR9, DOUBLEPAIR10, DOUBLEPAIRJ, DOUBLEPAIRQ, DOUBLEPAIRK, DOUBLEPAIRA]
-
-
-
-
-######### Trio cards points
-
-TRIOsingleMULTIPLIER = 50*3 ########## *3 because best score for AA + KK is 4400
-                            ########## and 999 is now 4500
-
-TRIO9 = SINGLE9 * TRIOsingleMULTIPLIER
-TRIO10 = SINGLE10 * TRIOsingleMULTIPLIER
-TRIOJ = SINGLEJ * TRIOsingleMULTIPLIER
-TRIOQ = SINGLEQ * TRIOsingleMULTIPLIER
-TRIOK = SINGLEK * TRIOsingleMULTIPLIER
-TRIOA = SINGLEA * TRIOsingleMULTIPLIER
-
-TRIO_MULTIPLIER_LIST = [TRIO9, TRIO10, TRIOJ, TRIOQ, TRIOK, TRIOA]
-
-
-
+TRIOPOINTS = 3000
 
 
 
@@ -435,9 +382,8 @@ def calculate_single_points(label_result,hand):
 
 def calculate_pair_points(label_result):
     pairsum = 0
-    for i in range(0,len(box_counter),1):
-        if box_counter[i].get() == 2:
-            pairsum = pairsum + box_counter[i].get() * PAIR_MULTIPLIER_LIST[i%6] 
+    if is_pair(hand) == True:
+        pairsum = pairsum + PAIRPOINTS
     print(pairsum)
     label_result.config(text="Result from pair points %d" %pairsum)
     return
@@ -446,13 +392,9 @@ def calculate_pair_points(label_result):
 
 def calculate_double_pair_points(label_result):
     doublepairsum = 0
-    SINGLEORDOUBLE = 0
-    for i in range(0,len(box_counter),1):
-        if box_counter[i].get() == 2:
-            doublepairsum = doublepairsum + box_counter[i].get() * DOUBLEPAIR_MULTIPLIER_LIST[i%6] 
-            SINGLEORDOUBLE = SINGLEORDOUBLE + 1
-    if SINGLEORDOUBLE < 2: ############ if 0 or 1 pair then sum = 0
-        doublepairsum = 0
+    if is_two_pair(hand) == True:
+        doublepairsum = doublepairsum + DOUBLEPAIRPOINTS
+
             
     print(doublepairsum)
     label_result.config(text="Result from doublepair points %d" %doublepairsum)
@@ -460,9 +402,8 @@ def calculate_double_pair_points(label_result):
 
 def calculate_trio_points(label_result):
     triosum = 0
-    for i in range(0,len(box_counter),1):
-        if box_counter[i].get() == 3:
-            triosum = triosum + box_counter[i].get() * TRIO_MULTIPLIER_LIST[i%6] 
+    if is_three_of_kind(hand) == True:
+        triosum = triosum + TRIOPOINTS
     print(triosum)
     label_result.config(text="Result from trio points %d" %triosum)
     return
