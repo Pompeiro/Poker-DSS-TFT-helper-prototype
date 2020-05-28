@@ -117,6 +117,8 @@ SINGLEQ = 40
 SINGLEK = 50
 SINGLEA = 60
 
+SINGLE_MULTIPLIER_LIST = [SINGLE9, SINGLE10, SINGLEJ, SINGLEQ, SINGLEK, SINGLEA]
+
 
 ############## PAIR POINTS
 
@@ -130,9 +132,12 @@ PAIRK = SINGLEK * PAIRsingleMULTIPLIER
 PAIRA = SINGLEA * PAIRsingleMULTIPLIER
 
 
+PAIR_MULTIPLIER_LIST = [PAIR9, PAIR10, PAIRJ, PAIRQ, PAIRK, PAIRA]
+
+
 ######### Double pair points
 
-DOUBLEPAIRsingleMULTIPLIER = 40
+DOUBLEPAIRsingleMULTIPLIER = 20
 
 DOUBLEPAIR9 = SINGLE9 * DOUBLEPAIRsingleMULTIPLIER
 DOUBLEPAIR10 = SINGLE10 * DOUBLEPAIRsingleMULTIPLIER
@@ -141,64 +146,82 @@ DOUBLEPAIRQ = SINGLEQ * DOUBLEPAIRsingleMULTIPLIER
 DOUBLEPAIRK = SINGLEK * DOUBLEPAIRsingleMULTIPLIER
 DOUBLEPAIRA = SINGLEA * DOUBLEPAIRsingleMULTIPLIER
 
+DOUBLEPAIR_MULTIPLIER_LIST = [DOUBLEPAIR9, DOUBLEPAIR10, DOUBLEPAIRJ, DOUBLEPAIRQ, DOUBLEPAIRK, DOUBLEPAIRA]
 
 
+
+
+######### Trio cards points
+
+TRIOsingleMULTIPLIER = 50
+
+TRIO9 = SINGLE9 * TRIOsingleMULTIPLIER
+TRIO10 = SINGLE10 * TRIOsingleMULTIPLIER
+TRIOJ = SINGLEJ * TRIOsingleMULTIPLIER
+TRIOQ = SINGLEQ * TRIOsingleMULTIPLIER
+TRIOK = SINGLEK * TRIOsingleMULTIPLIER
+TRIOA = SINGLEA * TRIOsingleMULTIPLIER
+
+TRIO_MULTIPLIER_LIST = [TRIO9, TRIO10, TRIOJ, TRIOQ, TRIOK, TRIOA]
+
+
+
+
+
+
+
+
+
+
+
+###################### POINTS MEASURE
 
 def calculate_single_points(label_result):
-    suma = (counterH9.get() * SINGLE9 
-    + counterH10.get() * SINGLE10 
-    + counterHJ.get() * SINGLEJ
-    + counterHQ.get() * SINGLEQ
-    + counterHK.get() * SINGLEK
-    + counterHA.get() * SINGLEA)
-    
-    print(suma)
+    suma = 0
+    for i in range(0,len(box_counter),1):
+        suma = suma + box_counter[i].get() * SINGLE_MULTIPLIER_LIST[i%6]    
+    print("Single points: ",suma)
     label_result.config(text="Result from single points %d" %suma)
     return
 
 
 def calculate_pair_points(label_result):
     pairsum = 0
-    if counterH9.get() == 2:
-        pairsum = pairsum + PAIR9
-    if counterH10.get() == 2:
-        pairsum = pairsum + PAIR10
-    if counterHJ.get() == 2:
-        pairsum = pairsum + PAIRJ
-    if counterHQ.get() == 2:
-        pairsum = pairsum + PAIRQ
-    if counterHK.get() == 2:
-        pairsum = pairsum + PAIRK
-    if counterHA.get() == 2:
-        pairsum = pairsum + PAIRA
-        
-        
+    for i in range(0,len(box_counter),1):
+        if box_counter[i].get() == 2:
+            pairsum = pairsum + box_counter[i].get() * PAIR_MULTIPLIER_LIST[i%6] 
     print(pairsum)
     label_result.config(text="Result from pair points %d" %pairsum)
     return
 
 
 
-
 def calculate_double_pair_points(label_result):
     doublepairsum = 0
-    if counterH9.get() == 4:
-        doublepairsum = doublepairsum + DOUBLEPAIR9
-    if counterH10.get() == 4:
-        doublepairsum = doublepairsum + DOUBLEPAIR10
-    if counterHJ.get() == 4:
-        doublepairsum = doublepairsum + DOUBLEPAIRJ
-    if counterHQ.get() == 4:
-        doublepairsum = doublepairsum + DOUBLEPAIRQ
-    if counterHK.get() == 4:
-        doublepairsum = doublepairsum + DOUBLEPAIRK
-    if counterHA.get() == 4:
-        doublepairsum = doublepairsum + DOUBLEPAIRA
-        
-        
+    SINGLEORDOUBLE = 0
+    for i in range(0,len(box_counter),1):
+        if box_counter[i].get() == 2:
+            doublepairsum = doublepairsum + box_counter[i].get() * DOUBLEPAIR_MULTIPLIER_LIST[i%6] 
+            SINGLEORDOUBLE = SINGLEORDOUBLE + 1
+    if SINGLEORDOUBLE < 2: ############ if 0 or 1 pair then sum = 0
+        doublepairsum = 0
+            
     print(doublepairsum)
     label_result.config(text="Result from doublepair points %d" %doublepairsum)
     return
+
+def calculate_trio_points(label_result):
+    triosum = 0
+    for i in range(0,len(box_counter),1):
+        if box_counter[i].get() == 3:
+            triosum = triosum + box_counter[i].get() * TRIO_MULTIPLIER_LIST[i%6] 
+    print(triosum)
+    label_result.config(text="Result from trio points %d" %triosum)
+    return
+
+
+
+
 
 
 def call_result(label_result, n1, n2):
@@ -662,6 +685,9 @@ pairResultLabel.grid(row=8, column=2)
 doublepairResultLabel = tk.Label(MainWindow)
 doublepairResultLabel.grid(row=9, column=2)
 
+trioResultLabel = tk.Label(MainWindow)
+trioResultLabel.grid(row=10, column=2)
+
 
 #######
 label = tk.Label(MainWindow, textvariable=x)
@@ -685,6 +711,8 @@ calculate_single_points = partial(calculate_single_points, singleResultLabel)
 calculate_pair_points = partial(calculate_pair_points, pairResultLabel)
 
 calculate_double_pair_points = partial(calculate_double_pair_points, doublepairResultLabel)
+
+calculate_trio_points = partial(calculate_trio_points, trioResultLabel)
 
 show_cards_left_buttons = partial(show_cards_left_buttons, cardsLeft)
 
@@ -732,6 +760,9 @@ buttonCal = tk.Button(MainWindow, text="pair", command=calculate_pair_points).gr
 
 
 buttonCal = tk.Button(MainWindow, text="doublepair", command=calculate_double_pair_points).grid(row=9, column=10)
+
+buttonCal = tk.Button(MainWindow, text="trio", command=calculate_trio_points).grid(row=10, column=10)
+
 
 
 buttonCal = tk.Button(MainWindow, text="checkcard", command=check_left_cards_in_deck).grid(row=11, column=10)
