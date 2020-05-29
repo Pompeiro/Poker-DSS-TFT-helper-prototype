@@ -35,7 +35,41 @@ RANDOMLYPICKEDCARDCOUNTER = 0
 
 
 
-############ CREATING FULL DECK
+
+############## POINTS CONSTANTS
+
+
+
+
+
+PAIRPOINTS = 500
+
+
+DOUBLEPAIRPOINTS = 1500
+
+TRIOPOINTS = 3000
+
+
+
+
+
+
+
+
+
+
+
+
+
+############ picking rank in int int(card[x][0])
+
+
+
+
+
+
+
+############ INITIALIZING FULL DECK
 
 FROMCARDOFFSET = 9
 NUMBEROFCARDSINFULLDECK = 24
@@ -58,13 +92,16 @@ A=14
 
 
 
-Suits = IntEnum("Suits", "spades hearts clubs diamonds")
+Suits = IntEnum("Suits", "hearts tiles clovers pikes")
 Ranks = IntEnum("Ranks", "x two three four five six seven eight nine ten jack queen king ace")
 
 Card = collections.namedtuple("Card", "rank suit")
 
 
 
+
+
+############# CREATING FULL DECK
 
 
 
@@ -78,19 +115,24 @@ for i in  range(1,len(Suits)+1,1): ### + 1 BECAUSE IntEnum starts from 1 not 0
 
 
 
+############## INITIALIZING LEFT CARDS
+
+cardsLeft = FULLDECK
+
+cardsToRemove = []
+
+cardsLeftString = []
 
 
 
 
 
 
+############## INITIALIZING PLAYER HAND
 
 
 
-
-
-
-
+hand = []
 
 
 
@@ -138,6 +180,11 @@ LISTAKART = [9, 10, J, Q, K, A]
 
 
 
+
+
+
+
+
 ######################## FULL DECK
 FULLDECKSTRING = [CARDDICTH["H9"], CARDDICTH["H10"], CARDDICTH["HJ"], CARDDICTH["HQ"], CARDDICTH["HK"], CARDDICTH["HA"],
             CARDDICTT["T9"], CARDDICTT["T10"], CARDDICTT["TJ"], CARDDICTT["TQ"], CARDDICTT["TK"], CARDDICTT["TA"],
@@ -146,6 +193,19 @@ FULLDECKSTRING = [CARDDICTH["H9"], CARDDICTH["H10"], CARDDICTH["HJ"], CARDDICTH[
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+############### WINDOW THINGS
 
 
 MainWindow = tk.Tk()
@@ -159,7 +219,35 @@ equation = tk.StringVar()
 x=tk.IntVar()
 
 
-############### LICZNIKI AKTUALNA LICZBA KART HEARTS $$$$$$$$$$$$$$$$$$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+############### COUNTERS FOR HEARTS CARDS $$$$$$$$$$$$$$$$$$
 counterH9=tk.IntVar()
 counterH10=tk.IntVar()
 counterHJ=tk.IntVar()
@@ -170,7 +258,7 @@ counterHA=tk.IntVar()
 
 
 
-############### LICZNIKI AKTUALNA LICZBA KART TILES $$$$$$$$$$$$$$$$$$
+############### COUNTERS FOR TILES CARDS $$$$$$$$$$$$$$$$$$
 counterT9=tk.IntVar()
 counterT10=tk.IntVar()
 counterTJ=tk.IntVar()
@@ -180,7 +268,7 @@ counterTA=tk.IntVar()
 
 
 
-############### LICZNIKI AKTUALNA LICZBA KART CLOVERS &&&&&&&&&&&&&&&&&&&&&
+############### COUNTERS FOR CLOVERS CARDS &&&&&&&&&&&&&&&&&&&&&
 counterC9=tk.IntVar()
 counterC10=tk.IntVar()
 counterCJ=tk.IntVar()
@@ -191,7 +279,7 @@ counterCA=tk.IntVar()
 
 
 
-############### LICZNIKI AKTUALNA LICZBA KART PIKES *********************8
+############### COUNTERS FOR PIKES CARDS *********************8
 counterP9=tk.IntVar()
 counterP10=tk.IntVar()
 counterPJ=tk.IntVar()
@@ -200,6 +288,24 @@ counterPK=tk.IntVar()
 counterPA=tk.IntVar()
 
 
+############### COUNTERS IN THE BOX
+
+box_counter = [counterH9, counterH10, counterHJ, counterHQ, counterHK, counterHA,
+               counterT9, counterT10, counterTJ, counterTQ, counterTK, counterTA,
+               counterC9, counterC10, counterCJ, counterCQ, counterCK, counterCA,
+               counterP9, counterP10, counterPJ, counterPQ, counterPK, counterPA,]
+
+
+
+
+
+
+
+
+
+
+
+################ TRANSLATING STRINGS OF CARDS TO COUNTERS, USED TO LINK THEM TOGETHER
 
 
 
@@ -221,23 +327,25 @@ lookup = {CARDDICTH["H9"]: counterH9, CARDDICTH["H10"]: counterH10, CARDDICTH["H
 
 
 
+############ SIMPLE DICT BUILD FOR NEW CARD DATA STRUCTURES
 
 
-def select_counter(cardleft): ### like cardleft convert to counter
-    # print("Card left input to select counter is:", cardleft)
-    obj = lookup.get(cardleft)
-    if obj:
-        # print("Output is:", obj)
-        return obj
+CARD2COUNTER = dict(zip(FULLDECK, box_counter))
+
+
+
+
+
+
+
+
     
 
 
 
+################## POKER functions
 
 
-
-
-hand = []
 
 def update_hand():
     for i in range(0,len(FULLDECK),1):
@@ -306,11 +414,25 @@ def is_royalflush(hand):
 
 ####### CHECK CARDS ON TABLE AND EVALUATE CARDS LEFT IN DECK
 
-cardsLeft = FULLDECK
 
-cardsToRemove = []
 
-cardsLeftString = []
+
+def select_counter(cardleft): ### like cardleft convert to counter
+    # print("Card left input to select counter is:", cardleft)
+    cardcounter = CARD2COUNTER[cardleft]
+    # print("Output is:", cardcounter)
+    return cardcounter
+
+
+
+
+
+
+
+
+
+
+
 
 def check_left_cards_in_deck(cardsLeft):
     for i in range(0,len(box_counter),1):
@@ -339,7 +461,7 @@ def check_left_cards_in_deck(cardsLeft):
 
 def show_cards_left_buttons(cardsLeft):
     for i in range(0,len(cardsLeft),1):
-        select_counter(cardsLeft[i])
+        # print("Thats the input to add",select_counter(cardsLeft[i]))
         buttonCal = tk.Button(MainWindow, text=cardsLeft[i], command=lambda i = i:add(select_counter(cardsLeft[i]))).grid(row=13, column=i)
     return
 
@@ -348,19 +470,12 @@ def pick_random_card_from_left_cards(cardsLeft):
     global RANDOMLYPICKEDCARDCOUNTER
     RANDOMLYPICKEDCARDCOUNTER =  RANDOMLYPICKEDCARDCOUNTER + 1
     Random_card_from_left_cards = cardsLeft[random.randint(0, (len(cardsLeft)-1))]
+    print(Random_card_from_left_cards)
     buttonCal = tk.Button(MainWindow, text=Random_card_from_left_cards, command=lambda:add(select_counter(Random_card_from_left_cards))).grid(row=15, column=RANDOMLYPICKEDCARDCOUNTER)
     return
 
 
 
-
-
-PAIRPOINTS = 500
-
-
-DOUBLEPAIRPOINTS = 1500
-
-TRIOPOINTS = 3000
 
 
 
@@ -474,25 +589,7 @@ def sub(intVariable):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-box_counter = [counterH9, counterH10, counterHJ, counterHQ, counterHK, counterHA,
-               counterT9, counterT10, counterTJ, counterTQ, counterTK, counterTA,
-               counterC9, counterC10, counterCJ, counterCQ, counterCK, counterCA,
-               counterP9, counterP10, counterPJ, counterPQ, counterPK, counterPA,]
-
-
-## tekst na ekranie oznaczenia kart HEARTS $$$$$$$$$$$$$$$$$$$
+## text signs near buttons HEARTS $$$$$$$$$$$$$$$$$$$
 
 labelTitle = tk.Label(MainWindow, text="Hearts").grid(row=0, column=2)
 
@@ -521,7 +618,7 @@ HaceEntry = tk.Entry(MainWindow)
 
 
 
-## tekst na ekranie oznaczenia kart TILES ^^^^^^^^^^^^^^^^^^
+## text signs near buttons TILES ^^^^^^^^^^^^^^^^^^
 
 labelTitle = tk.Label(MainWindow, text="TILES").grid(row=0, column=2 + SHIFTBETWEENCARDS)
 
@@ -552,7 +649,7 @@ TaceEntry = tk.Entry(MainWindow)
 
 
 
-## tekst na ekranie oznaczenia kart CLOVERS &&&&&&&&&&&&&&&&&&&
+## text signs near buttons CLOVERS &&&&&&&&&&&&&&&&&&&
 
 labelTitle = tk.Label(MainWindow, text="CLOVERS").grid(row=0, column=2 + SHIFTBETWEENCARDS * 2)
 
@@ -580,7 +677,7 @@ CaceEntry = tk.Entry(MainWindow)
 
 
 
-## tekst na ekranie oznaczenia kart PIKES **********************
+## text signs near buttons PIKES **********************
 
 labelTitle = tk.Label(MainWindow, text="PIKES").grid(row=0, column=2 + SHIFTBETWEENCARDS * 3)
 
@@ -627,7 +724,7 @@ CaceEntry = tk.Entry(MainWindow)
 
 
 
-## pasek do wpisywania zmiennych HEARTS $$$$$$$$$$$$
+## space to set amount of HEARTS $$$$$$$$$$$$
 
 entryNumH9 = tk.Entry(MainWindow, textvariable=counterH9, width = 4).grid(row=1, column=2)
 entryNumH10 = tk.Entry(MainWindow, textvariable=counterH10, width = 4).grid(row=2, column=2)
@@ -640,7 +737,7 @@ entryNumHA = tk.Entry(MainWindow, textvariable=counterHA, width = 4).grid(row=6,
 ##
 
 
-## pasek do wpisywania zmiennych TILES ^^^^^^^^^^^^^^^^^
+## space to set amount of TILES ^^^^^^^^^^^^^^^^^
 
 entryNumT9 = tk.Entry(MainWindow, textvariable=counterT9, width = 4).grid(row=1, column=2 + SHIFTBETWEENCARDS)
 entryNumT10 = tk.Entry(MainWindow, textvariable=counterT10, width = 4).grid(row=2, column=2 + SHIFTBETWEENCARDS)
@@ -654,7 +751,7 @@ entryNumTA = tk.Entry(MainWindow, textvariable=counterTA, width = 4).grid(row=6,
 
 
 
-## pasek do wpisywania zmiennych CLOVERS &&&&&&&&&&&&&&&&&&&
+## space to set amount of CLOVERS &&&&&&&&&&&&&&&&&&&
 
 entryNumC9 = tk.Entry(MainWindow, textvariable=counterC9, width = 4).grid(row=1, column=2 + SHIFTBETWEENCARDS * 2)
 entryNumC10 = tk.Entry(MainWindow, textvariable=counterC10, width = 4).grid(row=2, column=2 + SHIFTBETWEENCARDS * 2)
@@ -668,7 +765,7 @@ entryNumCA = tk.Entry(MainWindow, textvariable=counterCA, width = 4).grid(row=6,
 
 
 
-## pasek do wpisywania zmiennych PIKES **********************
+## space to set amount of PIKES **********************
 
 entryNumP9 = tk.Entry(MainWindow, textvariable=counterP9, width = 4).grid(row=1, column=2 + SHIFTBETWEENCARDS * 3)
 entryNumP10 = tk.Entry(MainWindow, textvariable=counterP10, width = 4).grid(row=2, column=2 + SHIFTBETWEENCARDS * 3)
@@ -688,7 +785,7 @@ entryNumPA = tk.Entry(MainWindow, textvariable=counterPA, width = 4).grid(row=6,
 
 
 
-##### PRZYCISKI do zmiany wartosci HEARTS $$$$$$$$$$$$$$$$$$$$$
+##### BUTTONS TO CHANGE HEARTS CARDS AMOUNT $$$$$$$$$$$$$$$$$$$$$
 
 buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterH9)).grid(row=1, column=3)
 buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterH9)).grid(row=1, column=4)
@@ -713,7 +810,7 @@ buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterHA)).grid(
 #######
 
 
-##### PRZYCISKI do zmiany wartosci TILES ^^^^^^^^^^^^^^^^^^^^^^^^
+##### BUTTONS TO CHANGE TILES CARDS AMOUNT ^^^^^^^^^^^^^^^^^^^^^^^^
 
 buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterT9)).grid(row=1, column=3 + SHIFTBETWEENCARDS)
 buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterT9)).grid(row=1, column=4 + SHIFTBETWEENCARDS)
@@ -735,7 +832,7 @@ buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterTA)).grid(
 
 
 
-##### PRZYCISKI do zmiany wartosci CLOVERS &&&&&&&&&&&&&&&&&&&&&&&
+#####  BUTTONS TO CHANGE CLOVERS CARDS AMOUNT &&&&&&&&&&&&&&&&&&&&&&&
 
 buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterC9)).grid(row=1, column=3 + SHIFTBETWEENCARDS * 2)
 buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterC9)).grid(row=1, column=4 + SHIFTBETWEENCARDS * 2)
@@ -758,7 +855,7 @@ buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterCA)).grid(
 
 
 
-##### PRZYCISKI do zmiany wartosci PIKES **************************
+##### BUTTONS TO CHANGE PIKES CARDS AMOUNT **************************
 
 buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterP9)).grid(row=1, column=3 + SHIFTBETWEENCARDS * 3)
 buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterP9)).grid(row=1, column=4 + SHIFTBETWEENCARDS * 3)
@@ -788,7 +885,7 @@ buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterPA)).grid(
 #######
 
 
-##### wynik pod buttonami
+##### scores under buttons
 
 singleResultLabel = tk.Label(MainWindow)
 singleResultLabel.grid(row=7, column=2)
@@ -815,12 +912,14 @@ label.grid(row=8, column=0)
 
 
 
-### funkcje liczone przez partial musza byc przed buttonami!!!!!!!!!!!!!
+###functions calculated with partial needs to be placed before buttons!!!!!!!!!!!!!
 
 call_result = partial(call_result, singleResultLabel, number1)
+
 substract_one = partial(substract_one, singleResultLabel, equation)
 
 check_value = partial(check_value, singleResultLabel, number1)
+
 calculate_single_points = partial(calculate_single_points, singleResultLabel, hand)
 
 calculate_pair_points = partial(calculate_pair_points, pairResultLabel)
@@ -865,7 +964,7 @@ pick_random_card_from_left_cards = partial(pick_random_card_from_left_cards, car
 
 
 
-########### PRZYCISKI ZWIAZANE Z LOGIKA I PUNKTACJA
+########### BUTTONS RESPONSIBLE FOR LOGIC AND POINTS
 
 
 
