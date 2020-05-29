@@ -26,6 +26,23 @@ import operator
 
 
 
+
+
+######## cheat sheet for namedtuple Card
+"""
+cardsLeft[0].suit.name
+Out[18]: 'hearts'
+
+
+cardsLeft[0].suit
+Out[24]: <Suits.hearts: 1>
+
+cardsLeft[0].suit.value
+Out[25]: 1
+"""
+
+
+
 SHIFTBETWEENCARDS = 8
 SHIFTADJUSTMENT = 1
 PADXBETWEENCARDNAMES = 20
@@ -356,6 +373,7 @@ def update_hand():
 
 def is_pair(hand):
     ranks = collections.Counter(map(operator.attrgetter("rank"), hand))
+    print(ranks)
     return ranks.most_common(1)[0][1] == 2
 
 
@@ -462,7 +480,7 @@ def check_left_cards_in_deck(cardsLeft):
 def show_cards_left_buttons(cardsLeft):
     for i in range(0,len(cardsLeft),1):
         # print("Thats the input to add",select_counter(cardsLeft[i]))
-        buttonCal = tk.Button(MainWindow, text=cardsLeft[i], command=lambda i = i:add(select_counter(cardsLeft[i]))).grid(row=13, column=i)
+        buttonCal = tk.Button(MainWindow, text=(cardsLeft[i].rank.name +' ' + cardsLeft[i].suit.name), command=lambda i = i:add(select_counter(cardsLeft[i]))).grid(row=13, column=i)
     return
 
 
@@ -487,11 +505,11 @@ def pick_random_card_from_left_cards(cardsLeft):
 ###################### POINTS MEASURE
 
 def calculate_single_points(label_result,hand):
-    suma = 0
+    singlesum = 0
     for i in range(0,len(hand),1):
-        suma = suma + int(hand[i][0])
-    print("Single points: ",suma)
-    label_result.config(text="Result from single points %d" %suma)
+        singlesum = singlesum + hand[i].rank.value
+    print("Single points: ",singlesum)
+    label_result.config(text="Result from single points %d" %singlesum)
     return
 
 
