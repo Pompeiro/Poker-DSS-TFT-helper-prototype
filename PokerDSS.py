@@ -228,12 +228,8 @@ FULLDECKSTRING = [CARDDICTH["H9"], CARDDICTH["H10"], CARDDICTH["HJ"], CARDDICTH[
 MainWindow = tk.Tk()
 MainWindow.geometry('1200x800')
 MainWindow.title('Advanced DSS card game calculator')
-number1 = tk.StringVar()
 
 
-equa = ""
-equation = tk.StringVar()
-x=tk.IntVar()
 
 
 
@@ -588,19 +584,7 @@ def substract_one(label_result, n1):
     return
 
 
-def EqualPress():
-    global equa
-    total = str(eval(equa))
-    equation.set(total)
-    #print(equation.get())
-    #equa = ""
- 
-    
-def btnPress(num):
-    global equa
-    equa = equa + str(num)
-    equation.set(equa)
-    EqualPress() 
+
     
     
 def check_value(label_result, stringVariable):
@@ -755,12 +739,12 @@ labelTitle = tk.Label(MainWindow, text="Random Cards Amount").grid(row=0, column
 
 
 
+labelTitle = tk.Label(MainWindow, text="Combo checking").grid(row=0, column=2 + SHIFTBETWEENCARDS * 5)
 
 
 
 
-
-
+labelTitle = tk.Label(MainWindow, text="User actions?").grid(row=0, column=2 + SHIFTBETWEENCARDS * 6)
 
 
 
@@ -952,8 +936,7 @@ trioResultLabel.grid(row=10, column=2)
 
 
 #######
-label = tk.Label(MainWindow, textvariable=x)
-label.grid(row=8, column=0)
+
 
 
 
@@ -964,11 +947,7 @@ label.grid(row=8, column=0)
 
 ###functions calculated with partial needs to be placed before buttons!!!!!!!!!!!!!
 
-call_result = partial(call_result, singleResultLabel, number1)
 
-substract_one = partial(substract_one, singleResultLabel, equation)
-
-check_value = partial(check_value, singleResultLabel, number1)
 
 calculate_single_points = partial(calculate_single_points, singleResultLabel, hand)
 
@@ -1018,20 +997,20 @@ pick_random_card_from_left_cards = partial(pick_random_card_from_left_cards, car
 
 
 
-buttonCal = tk.Button(MainWindow, text="single", command=calculate_single_points).grid(row=9, column=0)
+buttonCal = tk.Button(MainWindow, text="single", command=calculate_single_points).grid(row=1, column=2 + SHIFTBETWEENCARDS * 5)
 
-buttonCal = tk.Button(MainWindow, text="pair", command=calculate_pair_points).grid(row=9, column=3)
-
-
-buttonCal = tk.Button(MainWindow, text="doublepair", command=calculate_double_pair_points).grid(row=9, column=10)
-
-buttonCal = tk.Button(MainWindow, text="trio", command=calculate_trio_points).grid(row=10, column=10)
+buttonCal = tk.Button(MainWindow, text="pair", command=calculate_pair_points).grid(row=2, column=2 + SHIFTBETWEENCARDS * 5)
 
 
+buttonCal = tk.Button(MainWindow, text="doublepair", command=calculate_double_pair_points).grid(row=3, column=2 + SHIFTBETWEENCARDS * 5)
 
-buttonCal = tk.Button(MainWindow, text="checkcard", command=check_left_cards_in_deck).grid(row=11, column=10)
+buttonCal = tk.Button(MainWindow, text="trio", command=calculate_trio_points).grid(row=4, column=2 + SHIFTBETWEENCARDS * 5)
 
-buttonCal = tk.Button(MainWindow, text="Show left cards", command=lambda:show_card_as_button(cardsLeft,0,"Cards left")).grid(row=11, column=14)
+
+
+buttonCal = tk.Button(MainWindow, text="Update left cards", command=check_left_cards_in_deck).grid(row=2, column=2 + SHIFTBETWEENCARDS * 6)
+
+buttonCal = tk.Button(MainWindow, text="Show left cards", command=lambda:show_card_as_button(cardsLeft,0,"Cards left")).grid(row=3, column=2 + SHIFTBETWEENCARDS * 6)
 
 
 
@@ -1040,11 +1019,11 @@ buttonCal = tk.Button(MainWindow, text="Random cards", command=pick_random_card_
 buttonCal = tk.Button(MainWindow, text="Random hand", command=lambda:random_hand(RANDOMDRAWAMOUNT)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 4)
 
 
-buttonCal = tk.Button(MainWindow, text="Show hand", command=lambda:show_card_as_button(hand,5,"Current hand")).grid(row=4, column=2 + SHIFTBETWEENCARDS * 4)
+buttonCal = tk.Button(MainWindow, text="Show hand", command=lambda:show_card_as_button(hand,5,"Current hand")).grid(row=6, column=2 + SHIFTBETWEENCARDS * 6)
 
 
 
-buttonCal = tk.Button(MainWindow, text="Update hand", command=update_hand).grid(row=11, column=20)
+buttonCal = tk.Button(MainWindow, text="Update hand", command=update_hand).grid(row=5, column=2 + SHIFTBETWEENCARDS * 6)
 
 
 
