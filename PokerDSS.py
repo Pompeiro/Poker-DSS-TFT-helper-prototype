@@ -411,6 +411,23 @@ def create_hand_with_random_cards_on_the_table(hand,pickedRandomCards):
 
 
 
+def show_possible_hands_as_button(hand,pickedRandomCards):
+    """This func will show possible hands"""
+    possibleHands = create_hand_with_random_cards_on_the_table(hand,pickedRandomCards)
+    for i in range(0, len(possibleHands),1):
+        show_card_as_button(possibleHands[i],4+i,"Possible hands")
+    return
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -420,6 +437,14 @@ def show_card_as_button(cardsToBeButtons,rowOffset, textDescribingWhatIsOnTheBut
         # print("Thats the input to add",select_counter(cardsLeft[i]))
         buttonCal = tk.Button(MainWindow, text=(cardsToBeButtons[i].rank.name +' ' + cardsToBeButtons[i].suit.name), command=lambda i = i:add(select_counter(cardsToBeButtons[i]))).grid(row=12+rowOffset, column=i+3)
     return
+
+
+
+
+
+
+
+
 
 
 
@@ -1059,8 +1084,9 @@ buttonCal = tk.Button(MainWindow, text="Update hand", command=update_hand).grid(
 
 
 
-buttonCal = tk.Button(MainWindow, text="Create possible hands", command=lambda:create_hand_with_random_cards_on_the_table(hand,pickedRandomCards)).grid(row=7, column=2 + SHIFTBETWEENCARDS * 6)
+#buttonCal = tk.Button(MainWindow, text="Create possible hands", command=lambda:create_hand_with_random_cards_on_the_table(hand,pickedRandomCards)).grid(row=7, column=2 + SHIFTBETWEENCARDS * 6)
 
+buttonCal = tk.Button(MainWindow, text="Show possible hands", command=lambda:show_possible_hands_as_button(hand,pickedRandomCards)).grid(row=8, column=2 + SHIFTBETWEENCARDS * 6)
 
 
 
