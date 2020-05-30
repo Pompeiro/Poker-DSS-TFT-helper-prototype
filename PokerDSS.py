@@ -50,7 +50,7 @@ PADXBETWEENCARDNAMES = 20
 
 RANDOMLYPICKEDCARDCOUNTER = 0
 
-
+RANDOMDRAWAMOUNT = 4
 
 
 ############## POINTS CONSTANTS
@@ -152,11 +152,11 @@ cardsLeftString = []
 hand = []
 
 
+############# INITIALIZING PICKED RANDOM CARDS
 
 
 
-
-
+pickedRandomCards = []
 
 
 
@@ -374,6 +374,27 @@ def update_hand():
     print(hand)
     return
 
+
+
+def random_hand(RANDOMDRAWAMOUNT):
+    for i in range(0,RANDOMDRAWAMOUNT,1):
+        randomint =random.randint(0, (len(box_counter)-1))
+        box_counter[randomint].set(1)
+    for i in range(0,len(FULLDECK),1):
+        if lookup[FULLDECKSTRING[i]].get() == 1:
+            hand.append(FULLDECK[i])
+    print(hand)
+    return
+
+def show_card_as_button(cardsToBeButtons,rowOffset, textDescribingWhatIsOnTheButtons):
+    labeling = tk.Label(MainWindow, text=textDescribingWhatIsOnTheButtons).grid(row=12+rowOffset, column=0)
+    for i in range(0,len(cardsToBeButtons),1):
+        # print("Thats the input to add",select_counter(cardsLeft[i]))
+        buttonCal = tk.Button(MainWindow, text=(cardsToBeButtons[i].rank.name +' ' + cardsToBeButtons[i].suit.name), command=lambda i = i:add(select_counter(cardsToBeButtons[i]))).grid(row=12+rowOffset, column=i+3)
+    return
+
+
+
 def is_pair(hand):
     ranks = collections.Counter(map(operator.attrgetter("rank"), hand))
     print(ranks)
@@ -480,10 +501,10 @@ def check_left_cards_in_deck(cardsLeft):
 #     return cardsLeftString
 
 
-def show_cards_left_buttons(cardsLeft):
-    for i in range(0,len(cardsLeft),1):
+def show_cards_left_buttons(cardsLefts):
+    for i in range(0,len(cardsLefts),1):
         # print("Thats the input to add",select_counter(cardsLeft[i]))
-        buttonCal = tk.Button(MainWindow, text=(cardsLeft[i].rank.name +' ' + cardsLeft[i].suit.name), command=lambda i = i:add(select_counter(cardsLeft[i]))).grid(row=13, column=i)
+        buttonCal = tk.Button(MainWindow, text=(cardsLefts[i].rank.name +' ' + cardsLefts[i].suit.name), command=lambda i = i:add(select_counter(cardsLefts[i]))).grid(row=13, column=i)
     return
 
 
@@ -496,7 +517,8 @@ def pick_random_card_from_left_cards(cardsLeft):
         print(Random_card_from_left_cards)
         buttonCal = tk.Button(MainWindow, text=(Random_card_from_left_cards.rank.name +' ' + Random_card_from_left_cards.suit.name), command=lambda Random_card_from_left_cards = Random_card_from_left_cards:add(select_counter(Random_card_from_left_cards))).grid(row=15, column=RANDOMLYPICKEDCARDCOUNTER)
         cardsLeft.remove(Random_card_from_left_cards)
-    return cardsLeft
+        pickedRandomCards.append(Random_card_from_left_cards)
+    return 
 
 
 
@@ -1009,12 +1031,16 @@ buttonCal = tk.Button(MainWindow, text="trio", command=calculate_trio_points).gr
 
 buttonCal = tk.Button(MainWindow, text="checkcard", command=check_left_cards_in_deck).grid(row=11, column=10)
 
-buttonCal = tk.Button(MainWindow, text="Show left cards", command=show_cards_left_buttons).grid(row=11, column=14)
+buttonCal = tk.Button(MainWindow, text="Show left cards", command=lambda:show_card_as_button(cardsLeft,0,"Cards left")).grid(row=11, column=14)
 
 
 
 buttonCal = tk.Button(MainWindow, text="Random cards", command=pick_random_card_from_left_cards).grid(row=2, column=2 + SHIFTBETWEENCARDS * 4)
 
+buttonCal = tk.Button(MainWindow, text="Random hand", command=lambda:random_hand(RANDOMDRAWAMOUNT)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 4)
+
+
+buttonCal = tk.Button(MainWindow, text="Show hand", command=lambda:show_card_as_button(hand,5,"Current hand")).grid(row=4, column=2 + SHIFTBETWEENCARDS * 4)
 
 
 
