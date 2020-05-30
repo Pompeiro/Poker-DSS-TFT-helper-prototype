@@ -305,6 +305,12 @@ counterPK=tk.IntVar()
 counterPA=tk.IntVar()
 
 
+
+
+############## Counter for amount of random cards to pick
+counterRandomCardsToPick=tk.IntVar()
+
+
 ############### COUNTERS IN THE BOX
 
 box_counter = [counterH9, counterH10, counterHJ, counterHQ, counterHK, counterHA,
@@ -348,9 +354,6 @@ lookup = {CARDDICTH["H9"]: counterH9, CARDDICTH["H10"]: counterH10, CARDDICTH["H
 
 
 CARD2COUNTER = dict(zip(FULLDECK, box_counter))
-
-
-
 
 
 
@@ -485,16 +488,15 @@ def show_cards_left_buttons(cardsLeft):
 
 
 def pick_random_card_from_left_cards(cardsLeft):
-    global RANDOMLYPICKEDCARDCOUNTER
-    RANDOMLYPICKEDCARDCOUNTER =  RANDOMLYPICKEDCARDCOUNTER + 1
-    Random_card_from_left_cards = cardsLeft[random.randint(0, (len(cardsLeft)-1))]
-    print(Random_card_from_left_cards)
-    buttonCal = tk.Button(MainWindow, text=Random_card_from_left_cards, command=lambda:add(select_counter(Random_card_from_left_cards))).grid(row=15, column=RANDOMLYPICKEDCARDCOUNTER)
-    return
-
-
-
-
+    global RANDOMLYPICKEDCARDCOUNTER  ##### this variable is for future use to calculate points with random cards
+    print(counterRandomCardsToPick.get())
+    for i in range(0,counterRandomCardsToPick.get(),1):
+        RANDOMLYPICKEDCARDCOUNTER =  RANDOMLYPICKEDCARDCOUNTER + 1
+        Random_card_from_left_cards = cardsLeft[random.randint(0, (len(cardsLeft)-1))]
+        print(Random_card_from_left_cards)
+        buttonCal = tk.Button(MainWindow, text=(Random_card_from_left_cards.rank.name +' ' + Random_card_from_left_cards.suit.name), command=lambda Random_card_from_left_cards = Random_card_from_left_cards:add(select_counter(Random_card_from_left_cards))).grid(row=15, column=RANDOMLYPICKEDCARDCOUNTER)
+        cardsLeft.remove(Random_card_from_left_cards)
+    return cardsLeft
 
 
 
@@ -723,9 +725,9 @@ CaceEntry = tk.Entry(MainWindow)
 
 ##############################
 
+#### text sign for RANDOM CARDS AMOUNT
 
-
-
+labelTitle = tk.Label(MainWindow, text="Random Cards Amount").grid(row=0, column=2 + SHIFTBETWEENCARDS * 4)
 
 
 
@@ -794,6 +796,11 @@ entryNumPA = tk.Entry(MainWindow, textvariable=counterPA, width = 4).grid(row=6,
 
 
 ##
+
+
+## space to set amount of randomly picked cards
+
+entryNumH9 = tk.Entry(MainWindow, textvariable=counterRandomCardsToPick, width = 4).grid(row=1, column=2+ SHIFTBETWEENCARDS * 4)
 
 
 
@@ -896,7 +903,10 @@ buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterPA)).grid(
 
 
 
+##### BUTTONS TO CHANGE RANDOM CARDS AMOUNT
 
+buttonCal = tk.Button(MainWindow, text="+", command=lambda:add(counterRandomCardsToPick)).grid(row=1, column=3 + SHIFTBETWEENCARDS * 4)
+buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterRandomCardsToPick)).grid(row=1, column=4 + SHIFTBETWEENCARDS * 4)
 
 
 
@@ -1003,7 +1013,9 @@ buttonCal = tk.Button(MainWindow, text="Show left cards", command=show_cards_lef
 
 
 
-buttonCal = tk.Button(MainWindow, text="Pick random card", command=pick_random_card_from_left_cards).grid(row=11, column=17)
+buttonCal = tk.Button(MainWindow, text="Random cards", command=pick_random_card_from_left_cards).grid(row=2, column=2 + SHIFTBETWEENCARDS * 4)
+
+
 
 
 buttonCal = tk.Button(MainWindow, text="Update hand", command=update_hand).grid(row=11, column=20)
