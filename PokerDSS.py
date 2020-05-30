@@ -382,6 +382,38 @@ def random_hand(RANDOMDRAWAMOUNT):
     print(hand)
     return
 
+
+
+
+
+
+
+def create_hand_with_random_cards_on_the_table(hand,pickedRandomCards):
+    """"This func create full hand which is 5 cards.
+        User has at start 4 cards, and he need to update his hand,
+        or this func need to update hand first.
+        Func will add each card so user will have 5 cards.
+        The output is list of possible hands with cards on table."""
+    userHandPossibilities =[]
+    primalHandLenght = len(hand)
+    for i in range(0,len(pickedRandomCards),1):
+        #print("This random card will be added to hand:",pickedRandomCards[i])
+        hand.append(pickedRandomCards[i])
+        userHandPossibilities.append(hand)
+        #print("User hand possible is:",userHandPossibilities[i], i)   
+        hand = hand[0:primalHandLenght]
+        #print("User hand possible AFTER HAND REMOVE is:",userHandPossibilities[i], i)  
+        #print("Random card should be removed from the hand:",hand)
+    print("Every new user hand possibilities:", userHandPossibilities)
+    return userHandPossibilities
+
+
+
+
+
+
+
+
 def show_card_as_button(cardsToBeButtons,rowOffset, textDescribingWhatIsOnTheButtons):
     labeling = tk.Label(MainWindow, text=textDescribingWhatIsOnTheButtons).grid(row=12+rowOffset, column=0)
     for i in range(0,len(cardsToBeButtons),1):
@@ -1025,6 +1057,9 @@ buttonCal = tk.Button(MainWindow, text="Show hand", command=lambda:show_card_as_
 
 buttonCal = tk.Button(MainWindow, text="Update hand", command=update_hand).grid(row=5, column=2 + SHIFTBETWEENCARDS * 6)
 
+
+
+buttonCal = tk.Button(MainWindow, text="Create possible hands", command=lambda:create_hand_with_random_cards_on_the_table(hand,pickedRandomCards)).grid(row=7, column=2 + SHIFTBETWEENCARDS * 6)
 
 
 
