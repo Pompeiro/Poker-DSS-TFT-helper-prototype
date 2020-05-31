@@ -39,8 +39,17 @@ Out[24]: <Suits.hearts: 1>
 
 cardsLeft[0].suit.value
 Out[25]: 1
-"""
 
+
+
+
+
+
+
+
+my god, dont use append when u want local changes because it affects global scope
+"""
+" need to write show_possible_hands_points and highlight which card to pick"
 
 
 SHIFTBETWEENCARDS = 8
@@ -52,6 +61,8 @@ RANDOMLYPICKEDCARDCOUNTER = 0
 
 RANDOMDRAWAMOUNT = 4
 
+
+DEFAULTRANDOMCARDSTOPICKAMOUNT = 5
 
 ############## POINTS CONSTANTS
 
@@ -66,7 +77,17 @@ DOUBLEPAIRPOINTS = 1500
 
 TRIOPOINTS = 3000
 
+STRAIGHTPOINTS = 5000
 
+FLUSHPOINTS = 7000
+
+FULLHOUSEPOINTS = 9000
+
+FOURPOINTS = 10000
+
+STRAIGHTFLUSHPOINTS = 12012
+
+ROYALFLUSHPOINTS = 15000
 
 
 
@@ -133,8 +154,18 @@ for i in  range(1,len(Suits)+1,1): ### + 1 BECAUSE IntEnum starts from 1 not 0
 
 
 ############## INITIALIZING LEFT CARDS
+cardsLeft=[0] *NUMBEROFCARDSINFULLDECK
+CARDSCOUNTER1 = 0
 
-cardsLeft = FULLDECK
+for i in  range(1,len(Suits)+1,1): ### + 1 BECAUSE IntEnum starts from 1 not 0
+    for j in range(FROMCARDOFFSET, A+1,1): ### from offset card to Ace
+        # print(j,Suits(i))
+        # print(Card(Ranks(j),Suits(i)))
+        cardsLeft[CARDSCOUNTER1] = Card(Ranks(j),Suits(i))
+        CARDSCOUNTER1=CARDSCOUNTER1+1
+
+################## to avoid global relations
+
 
 cardsToRemove = []
 
@@ -158,8 +189,8 @@ hand = []
 
 pickedRandomCards = []
 
-
-
+### that will be discarded 
+cardsFromRandomButtons = []
 
 
 
@@ -307,6 +338,8 @@ counterPA=tk.IntVar()
 counterRandomCardsToPick=tk.IntVar()
 
 
+counterRandomCardsToPick.set(DEFAULTRANDOMCARDSTOPICKAMOUNT)
+
 ############### COUNTERS IN THE BOX
 
 box_counter = [counterH9, counterH10, counterHJ, counterHQ, counterHK, counterHA,
@@ -364,23 +397,157 @@ CARD2COUNTER = dict(zip(FULLDECK, box_counter))
 
 
 def update_hand():
+    """"Updating user hand(which is global:{ )"""
+    global hand
+    userHand =[]    
     for i in range(0,len(FULLDECK),1):
         if lookup[FULLDECKSTRING[i]].get() == 1:
-            hand.append(FULLDECK[i])
-    print(hand)
+            # print("User hand after append:", userHand)
+            userHand= userHand + [FULLDECK[i]]  
+            # print("User hand after add card:", userHand)
+    userHand = list(set(userHand))
+    hand = userHand
+    # print(hand)
+    return hand
+
+
+
+def update_hand_and_left_cards():
+    """"Use of update hand + update left cards in deck functions"""
+    update_left_cards_in_deck()
+    update_hand()
     return
 
 
 
-def random_hand(RANDOMDRAWAMOUNT):
-    for i in range(0,RANDOMDRAWAMOUNT,1):
-        randomint =random.randint(0, (len(box_counter)-1))
-        box_counter[randomint].set(1)
-    for i in range(0,len(FULLDECK),1):
-        if lookup[FULLDECKSTRING[i]].get() == 1:
-            hand.append(FULLDECK[i])
-    print(hand)
+
+
+
+def random_hand(randomdrawamount=RANDOMDRAWAMOUNT,cardsleft=cardsLeft):
+    global cardsFromRandomButtons
+    cardsPickedToBeRemoved = []
+    for i in range(0,randomdrawamount,1):
+        Random_card_from_left_cards = cardsleft[random.randint(0, (len(cardsleft)-1))]
+        select_counter(Random_card_from_left_cards).set(1)
+        cardsPickedToBeRemoved.append(Random_card_from_left_cards)
+        update_left_cards_in_deck(Random_card_from_left_cards)
+        # print(len(cardsLeft))
+        # print("Cards to be picked: ",cardsPickedToBeRemoved)
+    cardsFromRandomButtons = list(set(cardsFromRandomButtons + cardsPickedToBeRemoved))
+    # print("Cards from random buttons!!!!!!!!!!!!!!!!!!: ",cardsFromRandomButtons)
+    update_hand()
+    return cardsPickedToBeRemoved
+
+
+def random_hand_and_update_left_cards(randomdrawamount=RANDOMDRAWAMOUNT):
+    random_hand(randomdrawamount=RANDOMDRAWAMOUNT)
+    update_left_cards_in_deck()
+    show_card_as_button(hand,5,"Current hand")
     return
+
+
+
+
+
+
+
+
+
+
+
+def create_hand_with_random_cards_on_the_table(Hand,pickedRandomCards):
+    """"This func create full hand which is 5 cards.
+        User has at start 4 cards, and he need to update his hand,
+        or this func need to update hand first.
+        Func will add each card so user will have 5 cards.
+        The output is list of possible hands with cards on table.
+        Output userHandPossibilities is global variable"""
+    global userHandPossibilities   ##### idk its needed
+    userHandPossibilities =[]
+    for i in range(0,len(pickedRandomCards),1):
+        #print("This random card will be added to hand:",pickedRandomCards[i])
+        userHandPossibilities.append([])
+        userHandPossibilities[i]=Hand                                              ##### current hand to possible hand
+        #print("User hand possible is:",userHandPossibilities[i], i)   
+        userHandPossibilities[i] = userHandPossibilities[i] + [pickedRandomCards[i]]  #### random card + current hand   
+        #print("User hand possible AFTER HAND REMOVE is:",userHandPossibilities[i], i)  
+        #print("Random card should be removed from the hand:",Hand)
+    # print("Every new user hand possibilities:", userHandPossibilities)
+    # print("PRIMAL HANDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",len(Hand))
+    return userHandPossibilities
+
+
+
+
+
+def show_possible_hands_as_button(Hand,pickedRandomCards,rowOffset):
+    """This func will show possible hands"""
+    possibleHands = create_hand_with_random_cards_on_the_table(Hand,pickedRandomCards)
+    for i in range(0, len(possibleHands),1):
+        show_card_as_button(possibleHands[i],rowOffset+i,("Possible hands %s"%i))
+    return
+
+
+def show_possible_hands_as_button_with_points(Hand,pickedRandomCards,rowOffset):
+    """This func will show possible hands and points on screen"""
+    PointsForThisPossibleHand = calculate_points_for_possible_hands(Hand, pickedRandomCards)
+    possibleHands = create_hand_with_random_cards_on_the_table(Hand,pickedRandomCards)
+    for i in range(0, len(possibleHands),1):
+        show_card_as_button(possibleHands[i],rowOffset+i,("Possible hands %s"%i))
+        
+        labelTitle = tk.Label(MainWindow, text="Total Points: %s"%PointsForThisPossibleHand[i]).grid(row=12+rowOffset+i, column=12)
+
+    return
+
+
+
+
+def calculate_points_for_possible_hands(Hand,pickedRandomCards):
+    """This func will calculate final points for possible hand combinations"""
+    possibleHands = create_hand_with_random_cards_on_the_table(Hand,pickedRandomCards)
+    totalPointsForPossibleHand = []
+    for i in range(0, len(possibleHands),1):
+        print("Calculating for this possible hand",possibleHands[i])
+        y = calculate_points_for_hand(possibleHands[i])
+        totalPointsForPossibleHand = totalPointsForPossibleHand + [y]
+    return totalPointsForPossibleHand
+
+
+def calculate_points_for_hand(Hand):
+    """"This func calculate points for hand"""
+    sumlist = []
+    # print("Calculacion start!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    # print(Hand)
+    sumlist.append(calculate_single_points(Hand))
+    sumlist.append(calculate_pair_points(Hand))
+    sumlist.append(calculate_double_pair_points(Hand))
+    sumlist.append(calculate_trio_points(Hand))
+    
+    sumlist.append(calculate_straight_points(Hand))
+    sumlist.append(calculate_flush_points(Hand))
+    sumlist.append(calculate_full_house_points(Hand))
+    sumlist.append(calculate_four_points(Hand))
+    sumlist.append(calculate_straight_flush_points(Hand))
+    sumlist.append(calculate_royal_flush_points(Hand))
+    
+    # print("???????????????",Hand)
+
+    totalsum = sum(sumlist)
+    print("Total points for this hand= ",totalsum)
+    return totalsum
+
+
+
+
+    
+
+
+
+
+
+
+
+
 
 def show_card_as_button(cardsToBeButtons,rowOffset, textDescribingWhatIsOnTheButtons):
     labeling = tk.Label(MainWindow, text=textDescribingWhatIsOnTheButtons).grid(row=12+rowOffset, column=0)
@@ -391,53 +558,70 @@ def show_card_as_button(cardsToBeButtons,rowOffset, textDescribingWhatIsOnTheBut
 
 
 
+
+
+
+
+
+
+
+
 def is_pair(hand):
-    ranks = collections.Counter(map(operator.attrgetter("rank"), hand))
-    print(ranks)
-    return ranks.most_common(1)[0][1] == 2
+    if len(hand) > 0:
+        ranks = collections.Counter(map(operator.attrgetter("rank"), hand))
+        # print(ranks)
+        return ranks.most_common(1)[0][1] == 2
 
 
 def is_two_pair(hand):
-    ranks = collections.Counter(map(operator.attrgetter("rank"), hand))
-    pairs = ranks.most_common(2)
-    return pairs[0][1] == 2 and pairs[1][1] == 2
+    if len(hand) > 0:
+        ranks = collections.Counter(map(operator.attrgetter("rank"), hand))
+        pairs = ranks.most_common(2)
+        return pairs[0][1] == 2 and pairs[1][1] == 2
 
 
 def is_three_of_kind(hand):
-    ranks = collections.Counter(map(operator.attrgetter("rank"), hand))
-    return ranks.most_common(1)[0][1] == 3
+    if len(hand) > 0:
+        ranks = collections.Counter(map(operator.attrgetter("rank"), hand))
+        return ranks.most_common(1)[0][1] == 3
 
 
 def is_straight(hand):
-    hand.sort(key=operator.attrgetter("rank"))
-    start = hand[0].rank
-    straight = [Card(r, None) for r in range(start, start+6)]
-    print(straight)
-    return all(got.rank == want.rank for got,want in zip(hand, straight))
+    if len(hand) > 0:
+        hand.sort(key=operator.attrgetter("rank"))
+        start = hand[0].rank
+        straight = [Card(r, None) for r in range(start, start+6)]
+        # print(straight)
+        return all(got.rank == want.rank for got,want in zip(hand, straight))
 
 
 def is_flush(hand):
-    the_suit = hand[0].suit
-    return all(c.suit == the_suit for c in hand)
+    if len(hand) > 0:
+        the_suit = hand[0].suit
+        return all(c.suit == the_suit for c in hand)
 
 
 def is_full_house(hand):
-    ranks = collections.Counter(map(operator.attrgetter("rank"), hand))
-    triplet, pair = ranks.most_common(2)
-    return triplet[1] == 3 and pair[1] == 2
+    if len(hand) > 0:
+        ranks = collections.Counter(map(operator.attrgetter("rank"), hand))
+        triplet, pair = ranks.most_common(2)
+        return triplet[1] == 3 and pair[1] == 2
 
 def is_four_of_kind(hand):
-    ranks = collections.Counter(map(operator.attrgetter("rank"), hand))
-    return ranks.most_common(1)[0][1] == 4
+    if len(hand) > 0:
+        ranks = collections.Counter(map(operator.attrgetter("rank"), hand))
+        return ranks.most_common(1)[0][1] == 4
 
 
 def is_straightflush(hand):
-    return is_straight(hand) and is_flush(hand)
+    if len(hand) > 0:
+        return is_straight(hand) and is_flush(hand) 
 
 def is_royalflush(hand):
-    s = hand[0].suit
-    royal = [Card(Ranks(r), s) for r in range(10, A+1)]
-    return royal == sorted(hand, key=operator.attrgetter("rank"))
+    if len(hand) > 0:
+        s = hand[0].suit
+        royal = [Card(Ranks(r), s) for r in range(10, A+1)]
+        return royal == sorted(hand, key=operator.attrgetter("rank"))
 
 
 
@@ -485,8 +669,29 @@ def check_left_cards_in_deck(cardsLeft):
             cardsLeft.remove(card)
     print("Cards left in deck: ", cardsLeft)
     return
+    return
 
 
+
+def update_left_cards_in_deck(cardsFromRandomButtons=cardsFromRandomButtons):
+    global cardsLeft
+    cardsleft = cardsLeft ##### meaby i will figure out how to avoid global in tkinter
+    for card in cardsleft:
+        if select_counter(card).get() == 1:
+            cardsToRemove.append(card)
+            
+    if len(cardsFromRandomButtons) > 0:
+        for card in cardsFromRandomButtons:
+            cardsToRemove.append(card)
+    
+    
+    if len(cardsToRemove) > 0:
+        # print("Fulldeck: ", cardsLeft)
+        # print("Cards to remove from fulldeck: ", cardsToRemove)
+        cardsleft = list(set(cardsleft) - set(cardsToRemove))
+        # print("CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARDS LEFT:",cardsleft)
+        cardsLeft = cardsleft
+        return cardsLeft
 
 
 
@@ -498,6 +703,9 @@ def check_left_cards_in_deck(cardsLeft):
 
 
 def show_cards_left_buttons(cardsLefts):
+    print(cardsLefts)
+    cardsLefts = update_left_cards_in_deck(cardsLefts)
+    print(cardsLefts)
     for i in range(0,len(cardsLefts),1):
         # print("Thats the input to add",select_counter(cardsLeft[i]))
         buttonCal = tk.Button(MainWindow, text=(cardsLefts[i].rank.name +' ' + cardsLefts[i].suit.name), command=lambda i = i:add(select_counter(cardsLefts[i]))).grid(row=13, column=i)
@@ -524,42 +732,159 @@ def pick_random_card_from_left_cards(cardsLeft):
 
 ###################### POINTS MEASURE
 
-def calculate_single_points(label_result,hand):
+def calculate_single_points(Hand):
     singlesum = 0
-    for i in range(0,len(hand),1):
-        singlesum = singlesum + hand[i].rank.value
+    for i in range(0,len(Hand),1):
+        singlesum = singlesum + Hand[i].rank.value
     print("Single points: ",singlesum)
-    label_result.config(text="Result from single points %d" %singlesum)
-    return
+    return singlesum
 
 
-def calculate_pair_points(label_result):
+def calculate_pair_points(Hand):
     pairsum = 0
-    if is_pair(hand) == True:
+    if is_pair(Hand) == True:
         pairsum = pairsum + PAIRPOINTS
-    print(pairsum)
-    label_result.config(text="Result from pair points %d" %pairsum)
-    return
+    print("Pair points: ",pairsum)
+    return pairsum
 
 
 
-def calculate_double_pair_points(label_result):
+def calculate_double_pair_points(Hand):
     doublepairsum = 0
-    if is_two_pair(hand) == True:
+    if is_two_pair(Hand) == True:
         doublepairsum = doublepairsum + DOUBLEPAIRPOINTS
+    print("Double pair points: ",doublepairsum)
+    return doublepairsum
 
-            
-    print(doublepairsum)
-    label_result.config(text="Result from doublepair points %d" %doublepairsum)
-    return
-
-def calculate_trio_points(label_result):
+def calculate_trio_points(Hand):
     triosum = 0
-    if is_three_of_kind(hand) == True:
+    if is_three_of_kind(Hand) == True:
         triosum = triosum + TRIOPOINTS
-    print(triosum)
-    label_result.config(text="Result from trio points %d" %triosum)
+    print("Trio points: ",triosum)
+    return triosum
+
+
+def calculate_straight_points(Hand):
+    straightsum = 0
+    if is_straight(Hand) == True:
+        straightsum = straightsum + STRAIGHTPOINTS
+    print("Straight points: ",straightsum)
+    return straightsum
+
+
+def calculate_flush_points(Hand):
+    flushsum = 0
+    if is_flush(Hand) == True:
+        flushsum = flushsum + FLUSHPOINTS
+    print("Flush points: ",flushsum)
+    return flushsum
+
+
+def calculate_full_house_points(Hand):
+    fullhousesum = 0
+    if is_full_house(Hand) == True:
+        fullhousesum = fullhousesum + FULLHOUSEPOINTS
+    print("Full house points: ",fullhousesum)
+    return fullhousesum
+
+
+def calculate_four_points(Hand):
+    foursum = 0
+    if is_four_of_kind(Hand) == True:
+        foursum = foursum + FOURPOINTS
+    print("Four points: ",foursum)
+    return foursum
+
+
+def calculate_straight_flush_points(Hand):
+    straightflushsum = 0
+    if is_straightflush(Hand) == True:
+        straightflushsum = straightflushsum + STRAIGHTFLUSHPOINTS
+    print("Straight flush points: ",straightflushsum)
+    return straightflushsum
+
+
+def calculate_royal_flush_points(Hand):
+    royalflushsum = 0
+    if is_royalflush(Hand) == True:
+        royalflushsum = royalflushsum + ROYALFLUSHPOINTS
+    print("Royal flush points: ",royalflushsum)
+    return royalflushsum
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##################### Scores, label results here to avoid partial
+
+
+
+
+
+def show_single_points(singleSum,labelRow = 7, labelColumn = 2):
+    singleResultLabel = tk.Label(MainWindow)
+    singleResultLabel.grid(row=labelRow, column=labelColumn)
+    print("Single points: ",singleSum)
+    singleResultLabel.config(text="Result from single points %d" %singleSum)
     return
+
+
+def show_pair_points(pairSum, labelRow = 8, labelColumn = 2):
+    pairResultLabel = tk.Label(MainWindow)
+    pairResultLabel.grid(row=8, column=2)
+    print("Pair points: ",pairSum)
+    pairResultLabel.config(text="Result from pair points %d" %pairSum)
+    return
+
+
+
+def show_double_pair_points(doublePairSum, labelRow = 9, labelColumn = 2):
+    doublepairResultLabel = tk.Label(MainWindow)
+    doublepairResultLabel.grid(row=9, column=2)
+    print("Doble pair points: ",doublePairSum)
+    doublepairResultLabel.config(text="Result from doublepair points %d" %doublePairSum)
+    return
+
+def show_trio_points(trioSum, labelRow = 10, labelColumn = 2):
+    trioResultLabel = tk.Label(MainWindow)
+    trioResultLabel.grid(row=10, column=2)
+    print("Trio points: ",trioSum)
+    trioResultLabel.config(text="Result from trio points %d" %trioSum)
+    return
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -750,6 +1075,54 @@ labelTitle = tk.Label(MainWindow, text="User actions?").grid(row=0, column=2 + S
 
 
 
+
+
+
+labelTitle = tk.Label(MainWindow, text="Possible hands check").grid(row=0, column=2 + SHIFTBETWEENCARDS * 7)
+
+
+
+
+
+
+labelTitle = tk.Label(MainWindow, text="++ as update left cards").grid(row=0, column=2 + SHIFTBETWEENCARDS * 8)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## space to set amount of HEARTS $$$$$$$$$$$$
 
 entryNumH9 = tk.Entry(MainWindow, textvariable=counterH9, width = 4).grid(row=1, column=2)
@@ -916,28 +1289,6 @@ buttonCal = tk.Button(MainWindow, text="-", command=lambda:sub(counterRandomCard
 
 
 
-#######
-
-
-##### scores under buttons
-
-singleResultLabel = tk.Label(MainWindow)
-singleResultLabel.grid(row=7, column=2)
-
-pairResultLabel = tk.Label(MainWindow)
-pairResultLabel.grid(row=8, column=2)
-
-
-doublepairResultLabel = tk.Label(MainWindow)
-doublepairResultLabel.grid(row=9, column=2)
-
-trioResultLabel = tk.Label(MainWindow)
-trioResultLabel.grid(row=10, column=2)
-
-
-#######
-
-
 
 
 
@@ -949,18 +1300,9 @@ trioResultLabel.grid(row=10, column=2)
 
 
 
-calculate_single_points = partial(calculate_single_points, singleResultLabel, hand)
-
-calculate_pair_points = partial(calculate_pair_points, pairResultLabel)
-
-calculate_double_pair_points = partial(calculate_double_pair_points, doublepairResultLabel)
-
-calculate_trio_points = partial(calculate_trio_points, trioResultLabel)
-
-show_cards_left_buttons = partial(show_cards_left_buttons, cardsLeft)
 
 
-check_left_cards_in_deck = partial(check_left_cards_in_deck, cardsLeft)
+
 
 pick_random_card_from_left_cards = partial(pick_random_card_from_left_cards, cardsLeft)
 
@@ -997,20 +1339,20 @@ pick_random_card_from_left_cards = partial(pick_random_card_from_left_cards, car
 
 
 
-buttonCal = tk.Button(MainWindow, text="single", command=calculate_single_points).grid(row=1, column=2 + SHIFTBETWEENCARDS * 5)
+buttonCal = tk.Button(MainWindow, text="single", command=lambda:show_single_points(calculate_single_points(hand))).grid(row=1, column=2 + SHIFTBETWEENCARDS * 5)
 
-buttonCal = tk.Button(MainWindow, text="pair", command=calculate_pair_points).grid(row=2, column=2 + SHIFTBETWEENCARDS * 5)
-
-
-buttonCal = tk.Button(MainWindow, text="doublepair", command=calculate_double_pair_points).grid(row=3, column=2 + SHIFTBETWEENCARDS * 5)
-
-buttonCal = tk.Button(MainWindow, text="trio", command=calculate_trio_points).grid(row=4, column=2 + SHIFTBETWEENCARDS * 5)
+buttonCal = tk.Button(MainWindow, text="pair", command=lambda:show_pair_points(calculate_pair_points(hand))).grid(row=2, column=2 + SHIFTBETWEENCARDS * 5)
 
 
+buttonCal = tk.Button(MainWindow, text="doublepair", command=lambda:show_double_pair_points(calculate_double_pair_points(hand))).grid(row=3, column=2 + SHIFTBETWEENCARDS * 5)
 
-buttonCal = tk.Button(MainWindow, text="Update left cards", command=check_left_cards_in_deck).grid(row=2, column=2 + SHIFTBETWEENCARDS * 6)
+buttonCal = tk.Button(MainWindow, text="trio", command=lambda:show_trio_points(calculate_trio_points(hand))).grid(row=4, column=2 + SHIFTBETWEENCARDS * 5)
 
-buttonCal = tk.Button(MainWindow, text="Show left cards", command=lambda:show_card_as_button(cardsLeft,0,"Cards left")).grid(row=3, column=2 + SHIFTBETWEENCARDS * 6)
+
+
+buttonCal = tk.Button(MainWindow, text="Update left cards", command=lambda:update_left_cards_in_deck()).grid(row=2, column=2 + SHIFTBETWEENCARDS * 6)
+
+buttonCal = tk.Button(MainWindow, text="Show left cards", command=lambda:show_cards_left_buttons(cardsLeft)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 6)
 
 
 
@@ -1023,11 +1365,26 @@ buttonCal = tk.Button(MainWindow, text="Show hand", command=lambda:show_card_as_
 
 
 
-buttonCal = tk.Button(MainWindow, text="Update hand", command=update_hand).grid(row=5, column=2 + SHIFTBETWEENCARDS * 6)
+buttonCal = tk.Button(MainWindow, text="Update hand", command=lambda:update_hand()).grid(row=5, column=2 + SHIFTBETWEENCARDS * 6)
+
+
+
+#buttonCal = tk.Button(MainWindow, text="Create possible hands", command=lambda:create_hand_with_random_cards_on_the_table(hand,pickedRandomCards)).grid(row=7, column=2 + SHIFTBETWEENCARDS * 6)
+
+buttonCal = tk.Button(MainWindow, text="Show possible hands", command=lambda:show_possible_hands_as_button(hand,pickedRandomCards,6)).grid(row=1, column=2 + SHIFTBETWEENCARDS * 7)
+
+buttonCal = tk.Button(MainWindow, text="Calc possible hands", command=lambda:calculate_points_for_possible_hands(hand,pickedRandomCards)).grid(row=2, column=2 + SHIFTBETWEENCARDS * 7)
+
+buttonCal = tk.Button(MainWindow, text="Show possible hands++", command=lambda:show_possible_hands_as_button_with_points(hand,pickedRandomCards,6)).grid(row=4, column=2 + SHIFTBETWEENCARDS * 7)
 
 
 
 
+
+
+buttonCal = tk.Button(MainWindow, text="Update++ cards", command=lambda:update_hand_and_left_cards()).grid(row=2, column=2 + SHIFTBETWEENCARDS * 8)
+
+buttonCal = tk.Button(MainWindow, text="Random++ hand", command=lambda:random_hand_and_update_left_cards(RANDOMDRAWAMOUNT)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 9)
 
 
 
