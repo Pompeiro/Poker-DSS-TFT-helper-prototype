@@ -431,7 +431,7 @@ def random_hand(randomdrawamount=RANDOMDRAWAMOUNT,cardsleft=cardsLeft):
         select_counter(Random_card_from_left_cards).set(1)
         cardsPickedToBeRemoved.append(Random_card_from_left_cards)
         update_left_cards_in_deck(Random_card_from_left_cards)
-        print(len(cardsLeft))
+        # print(len(cardsLeft))
         # print("Cards to be picked: ",cardsPickedToBeRemoved)
     cardsFromRandomButtons = list(set(cardsFromRandomButtons + cardsPickedToBeRemoved))
     # print("Cards from random buttons!!!!!!!!!!!!!!!!!!: ",cardsFromRandomButtons)
@@ -488,14 +488,29 @@ def show_possible_hands_as_button(Hand,pickedRandomCards,rowOffset):
     return
 
 
+def show_possible_hands_as_button_with_points(Hand,pickedRandomCards,rowOffset):
+    """This func will show possible hands and points on screen"""
+    PointsForThisPossibleHand = calculate_points_for_possible_hands(Hand, pickedRandomCards)
+    possibleHands = create_hand_with_random_cards_on_the_table(Hand,pickedRandomCards)
+    for i in range(0, len(possibleHands),1):
+        show_card_as_button(possibleHands[i],rowOffset+i,("Possible hands %s"%i))
+        
+        labelTitle = tk.Label(MainWindow, text="Total Points: %s"%PointsForThisPossibleHand[i]).grid(row=12+rowOffset+i, column=12)
+
+    return
+
+
+
 
 def calculate_points_for_possible_hands(Hand,pickedRandomCards):
     """This func will calculate final points for possible hand combinations"""
     possibleHands = create_hand_with_random_cards_on_the_table(Hand,pickedRandomCards)
+    totalPointsForPossibleHand = []
     for i in range(0, len(possibleHands),1):
         print("Calculating for this possible hand",possibleHands[i])
-        calculate_points_for_hand(possibleHands[i])
-    return
+        y = calculate_points_for_hand(possibleHands[i])
+        totalPointsForPossibleHand = totalPointsForPossibleHand + [y]
+    return totalPointsForPossibleHand
 
 
 def calculate_points_for_hand(Hand):
@@ -519,7 +534,7 @@ def calculate_points_for_hand(Hand):
 
     totalsum = sum(sumlist)
     print("Total points for this hand= ",totalsum)
-    return
+    return totalsum
 
 
 
@@ -1360,11 +1375,21 @@ buttonCal = tk.Button(MainWindow, text="Show possible hands", command=lambda:sho
 
 buttonCal = tk.Button(MainWindow, text="Calc possible hands", command=lambda:calculate_points_for_possible_hands(hand,pickedRandomCards)).grid(row=2, column=2 + SHIFTBETWEENCARDS * 7)
 
+buttonCal = tk.Button(MainWindow, text="Show possible hands++", command=lambda:show_possible_hands_as_button_with_points(hand,pickedRandomCards,6)).grid(row=4, column=2 + SHIFTBETWEENCARDS * 7)
+
+
+
+
 
 
 buttonCal = tk.Button(MainWindow, text="Update++ cards", command=lambda:update_hand_and_left_cards()).grid(row=2, column=2 + SHIFTBETWEENCARDS * 8)
 
 buttonCal = tk.Button(MainWindow, text="Random++ hand", command=lambda:random_hand_and_update_left_cards(RANDOMDRAWAMOUNT)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 9)
+
+
+
+
+
 
 
 MainWindow.mainloop()
