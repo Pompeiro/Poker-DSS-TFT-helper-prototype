@@ -372,20 +372,19 @@ CARD2COUNTER = dict(zip(FULLDECK, box_counter))
 
 
 
-def update_hand(Hand):
-    global cardsLeft
+def update_hand():
+    global cardsLeft, hand
     cardsLeft = update_left_cards_in_deck(cardsLeft)
     userHand =[]    
     for i in range(0,len(FULLDECK),1):
         if lookup[FULLDECKSTRING[i]].get() == 1:
-            # userHand.append([])
-            print("User hand after append:", userHand)
+            # print("User hand after append:", userHand)
             userHand= userHand + [FULLDECK[i]]  
-            print("User hand after add card:", userHand)
+            # print("User hand after add card:", userHand)
     userHand = list(set(userHand))
-    Hand = userHand
-    print(Hand)
-    return Hand
+    hand = userHand
+    print(hand)
+    return hand
 
 
 
@@ -1199,7 +1198,7 @@ buttonCal = tk.Button(MainWindow, text="Show hand", command=lambda:show_card_as_
 
 
 
-buttonCal = tk.Button(MainWindow, text="Update hand", command=lambda:update_hand(hand)).grid(row=5, column=2 + SHIFTBETWEENCARDS * 6)
+buttonCal = tk.Button(MainWindow, text="Update hand", command=lambda:update_hand()).grid(row=5, column=2 + SHIFTBETWEENCARDS * 6)
 
 
 
