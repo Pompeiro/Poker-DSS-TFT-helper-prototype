@@ -375,10 +375,15 @@ CARD2COUNTER = dict(zip(FULLDECK, box_counter))
 def update_hand(Hand):
     global cardsLeft
     cardsLeft = update_left_cards_in_deck(cardsLeft)
+    userHand =[]    
     for i in range(0,len(FULLDECK),1):
         if lookup[FULLDECKSTRING[i]].get() == 1:
-            Hand.append(FULLDECK[i])
-    Hand = list(set(Hand))
+            # userHand.append([])
+            print("User hand after append:", userHand)
+            userHand= userHand + [FULLDECK[i]]  
+            print("User hand after add card:", userHand)
+    userHand = list(set(userHand))
+    Hand = userHand
     print(Hand)
     return Hand
 
@@ -411,9 +416,9 @@ def create_hand_with_random_cards_on_the_table(Hand,pickedRandomCards):
     for i in range(0,len(pickedRandomCards),1):
         #print("This random card will be added to hand:",pickedRandomCards[i])
         userHandPossibilities.append([])
-        userHandPossibilities[i]=Hand
+        userHandPossibilities[i]=Hand                                              ##### current hand to possible hand
         #print("User hand possible is:",userHandPossibilities[i], i)   
-        userHandPossibilities[i] = userHandPossibilities[i] + [pickedRandomCards[i]]     
+        userHandPossibilities[i] = userHandPossibilities[i] + [pickedRandomCards[i]]  #### random card + current hand   
         #print("User hand possible AFTER HAND REMOVE is:",userHandPossibilities[i], i)  
         #print("Random card should be removed from the hand:",Hand)
     # print("Every new user hand possibilities:", userHandPossibilities)
