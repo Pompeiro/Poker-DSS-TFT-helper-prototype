@@ -373,8 +373,8 @@ CARD2COUNTER = dict(zip(FULLDECK, box_counter))
 
 
 def update_hand():
-    global cardsLeft, hand
-    cardsLeft = update_left_cards_in_deck(cardsLeft)
+    """"Updating user hand(which is global:{ )"""
+    global hand
     userHand =[]    
     for i in range(0,len(FULLDECK),1):
         if lookup[FULLDECKSTRING[i]].get() == 1:
@@ -383,12 +383,25 @@ def update_hand():
             # print("User hand after add card:", userHand)
     userHand = list(set(userHand))
     hand = userHand
-    print(hand)
+    # print(hand)
     return hand
 
 
 
-def random_hand(RANDOMDRAWAMOUNT, Hand):
+def update_hand_and_left_cards():
+    """"Use of update hand + update left cards in deck functions"""
+    update_left_cards_in_deck()
+    update_hand()
+    return
+
+
+
+
+
+
+def random_hand(RANDOMDRAWAMOUNT):
+    global hand
+    Hand = []
     for i in range(0,RANDOMDRAWAMOUNT,1):
         randomint =random.randint(0, (len(box_counter)-1))
         box_counter[randomint].set(1)
@@ -397,7 +410,18 @@ def random_hand(RANDOMDRAWAMOUNT, Hand):
             Hand.append(FULLDECK[i])
     Hand =list(set(Hand))
     print(Hand)
+    hand = Hand
     return Hand
+
+
+def random_hand_and_update_left_cards(RANDOMDRAWAMOUNT):
+    random_hand(RANDOMDRAWAMOUNT)
+    update_left_cards_in_deck()
+    return
+
+
+
+
 
 
 
@@ -410,7 +434,9 @@ def create_hand_with_random_cards_on_the_table(Hand,pickedRandomCards):
         User has at start 4 cards, and he need to update his hand,
         or this func need to update hand first.
         Func will add each card so user will have 5 cards.
-        The output is list of possible hands with cards on table."""
+        The output is list of possible hands with cards on table.
+        Output userHandPossibilities is global variable"""
+    global userHandPossibilities
     userHandPossibilities =[]
     for i in range(0,len(pickedRandomCards),1):
         #print("This random card will be added to hand:",pickedRandomCards[i])
@@ -585,7 +611,9 @@ def check_left_cards_in_deck(cardsLeft):
 
 
 
-def update_left_cards_in_deck(cardsleft):
+def update_left_cards_in_deck():
+    global cardsLeft
+    cardsleft = cardsLeft ##### meaby i will figure out how to avoid global in tkinter
     for card in cardsleft:
         if select_counter(card).get() == 1:
             cardsToRemove.append(card)
@@ -594,7 +622,8 @@ def update_left_cards_in_deck(cardsleft):
         # print("Cards to remove from fulldeck: ", cardsToRemove)
         cardsleft = list(set(cardsleft) - set(cardsToRemove))
         # print("CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARDS LEFT:",cardsleft)
-        return cardsleft
+        cardsLeft = cardsleft
+        return cardsLeft
 
 
 
@@ -919,6 +948,7 @@ labelTitle = tk.Label(MainWindow, text="Possible hands check").grid(row=0, colum
 
 
 
+labelTitle = tk.Label(MainWindow, text="++ as update left cards").grid(row=0, column=2 + SHIFTBETWEENCARDS * 8)
 
 
 
@@ -1183,7 +1213,7 @@ buttonCal = tk.Button(MainWindow, text="trio", command=lambda:show_trio_points(c
 
 
 
-buttonCal = tk.Button(MainWindow, text="Update left cards", command=lambda:update_left_cards_in_deck(cardsLeft)).grid(row=2, column=2 + SHIFTBETWEENCARDS * 6)
+buttonCal = tk.Button(MainWindow, text="Update left cards", command=lambda:update_left_cards_in_deck()).grid(row=2, column=2 + SHIFTBETWEENCARDS * 6)
 
 buttonCal = tk.Button(MainWindow, text="Show left cards", command=lambda:show_cards_left_buttons(cardsLeft)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 6)
 
@@ -1191,7 +1221,7 @@ buttonCal = tk.Button(MainWindow, text="Show left cards", command=lambda:show_ca
 
 buttonCal = tk.Button(MainWindow, text="Random cards", command=pick_random_card_from_left_cards).grid(row=2, column=2 + SHIFTBETWEENCARDS * 4)
 
-buttonCal = tk.Button(MainWindow, text="Random hand", command=lambda:random_hand(RANDOMDRAWAMOUNT,hand)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 4)
+buttonCal = tk.Button(MainWindow, text="Random hand", command=lambda:random_hand(RANDOMDRAWAMOUNT)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 4)
 
 
 buttonCal = tk.Button(MainWindow, text="Show hand", command=lambda:show_card_as_button(hand,5,"Current hand")).grid(row=6, column=2 + SHIFTBETWEENCARDS * 6)
@@ -1210,9 +1240,9 @@ buttonCal = tk.Button(MainWindow, text="Calc possible hands", command=lambda:cal
 
 
 
+buttonCal = tk.Button(MainWindow, text="Update++ cards", command=lambda:update_hand_and_left_cards()).grid(row=2, column=2 + SHIFTBETWEENCARDS * 8)
 
-
-
+buttonCal = tk.Button(MainWindow, text="Random++ hand", command=lambda:random_hand_and_update_left_cards(RANDOMDRAWAMOUNT)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 8)
 
 
 MainWindow.mainloop()
