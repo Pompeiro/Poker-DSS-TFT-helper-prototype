@@ -436,7 +436,7 @@ def create_hand_with_random_cards_on_the_table(Hand,pickedRandomCards):
         Func will add each card so user will have 5 cards.
         The output is list of possible hands with cards on table.
         Output userHandPossibilities is global variable"""
-    global userHandPossibilities
+    global userHandPossibilities   ##### idk its needed
     userHandPossibilities =[]
     for i in range(0,len(pickedRandomCards),1):
         #print("This random card will be added to hand:",pickedRandomCards[i])
@@ -507,7 +507,7 @@ def show_card_as_button(cardsToBeButtons,rowOffset, textDescribingWhatIsOnTheBut
 def is_pair(hand):
     if len(hand) > 0:
         ranks = collections.Counter(map(operator.attrgetter("rank"), hand))
-        print(ranks)
+        # print(ranks)
         return ranks.most_common(1)[0][1] == 2
 
 
@@ -708,15 +708,15 @@ def calculate_trio_points(Hand):
 
 
 
-def show_single_points(singleSum):
+def show_single_points(singleSum,labelRow = 7, labelColumn = 2):
     singleResultLabel = tk.Label(MainWindow)
-    singleResultLabel.grid(row=7, column=2)
+    singleResultLabel.grid(row=labelRow, column=labelColumn)
     print("Single points: ",singleSum)
     singleResultLabel.config(text="Result from single points %d" %singleSum)
     return
 
 
-def show_pair_points(label_result,pairSum):
+def show_pair_points(pairSum, labelRow = 8, labelColumn = 2):
     pairResultLabel = tk.Label(MainWindow)
     pairResultLabel.grid(row=8, column=2)
     print("Pair points: ",pairSum)
@@ -725,14 +725,14 @@ def show_pair_points(label_result,pairSum):
 
 
 
-def show_double_pair_points(label_result,doublePairSum):
+def show_double_pair_points(doublePairSum, labelRow = 9, labelColumn = 2):
     doublepairResultLabel = tk.Label(MainWindow)
     doublepairResultLabel.grid(row=9, column=2)
     print("Doble pair points: ",doublePairSum)
     doublepairResultLabel.config(text="Result from doublepair points %d" %doublePairSum)
     return
 
-def show_trio_points(trioSum):
+def show_trio_points(trioSum, labelRow = 10, labelColumn = 2):
     trioResultLabel = tk.Label(MainWindow)
     trioResultLabel.grid(row=10, column=2)
     print("Trio points: ",trioSum)
