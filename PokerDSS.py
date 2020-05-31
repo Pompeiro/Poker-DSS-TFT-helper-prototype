@@ -154,8 +154,18 @@ for i in  range(1,len(Suits)+1,1): ### + 1 BECAUSE IntEnum starts from 1 not 0
 
 
 ############## INITIALIZING LEFT CARDS
+cardsLeft=[0] *NUMBEROFCARDSINFULLDECK
+CARDSCOUNTER1 = 0
 
-cardsLeft = FULLDECK
+for i in  range(1,len(Suits)+1,1): ### + 1 BECAUSE IntEnum starts from 1 not 0
+    for j in range(FROMCARDOFFSET, A+1,1): ### from offset card to Ace
+        # print(j,Suits(i))
+        # print(Card(Ranks(j),Suits(i)))
+        cardsLeft[CARDSCOUNTER1] = Card(Ranks(j),Suits(i))
+        CARDSCOUNTER1=CARDSCOUNTER1+1
+
+################## to avoid global relations
+
 
 cardsToRemove = []
 
@@ -179,8 +189,8 @@ hand = []
 
 pickedRandomCards = []
 
-
-
+### that will be discarded 
+cardsFromRandomButtons = []
 
 
 
@@ -413,24 +423,26 @@ def update_hand_and_left_cards():
 
 
 
-def random_hand(RANDOMDRAWAMOUNT):
-    global hand
-    Hand = []
-    for i in range(0,RANDOMDRAWAMOUNT,1):
-        randomint =random.randint(0, (len(box_counter)-1))
-        box_counter[randomint].set(1)
-    for i in range(0,len(FULLDECK),1):
-        if lookup[FULLDECKSTRING[i]].get() == 1:
-            Hand.append(FULLDECK[i])
-    Hand =list(set(Hand))
-    print(Hand)
-    hand = Hand
-    return Hand
+def random_hand(randomdrawamount=RANDOMDRAWAMOUNT,cardsleft=cardsLeft):
+    global cardsFromRandomButtons
+    cardsPickedToBeRemoved = []
+    for i in range(0,randomdrawamount,1):
+        Random_card_from_left_cards = cardsleft[random.randint(0, (len(cardsleft)-1))]
+        select_counter(Random_card_from_left_cards).set(1)
+        cardsPickedToBeRemoved.append(Random_card_from_left_cards)
+        update_left_cards_in_deck(Random_card_from_left_cards)
+        print(len(cardsLeft))
+        # print("Cards to be picked: ",cardsPickedToBeRemoved)
+    cardsFromRandomButtons = list(set(cardsFromRandomButtons + cardsPickedToBeRemoved))
+    # print("Cards from random buttons!!!!!!!!!!!!!!!!!!: ",cardsFromRandomButtons)
+    update_hand()
+    return cardsPickedToBeRemoved
 
 
-def random_hand_and_update_left_cards(RANDOMDRAWAMOUNT):
-    random_hand(RANDOMDRAWAMOUNT)
+def random_hand_and_update_left_cards(randomdrawamount=RANDOMDRAWAMOUNT):
+    random_hand(randomdrawamount=RANDOMDRAWAMOUNT)
     update_left_cards_in_deck()
+    show_card_as_button(hand,5,"Current hand")
     return
 
 
@@ -646,12 +658,18 @@ def check_left_cards_in_deck(cardsLeft):
 
 
 
-def update_left_cards_in_deck():
+def update_left_cards_in_deck(cardsFromRandomButtons=cardsFromRandomButtons):
     global cardsLeft
     cardsleft = cardsLeft ##### meaby i will figure out how to avoid global in tkinter
     for card in cardsleft:
         if select_counter(card).get() == 1:
             cardsToRemove.append(card)
+            
+    if len(cardsFromRandomButtons) > 0:
+        for card in cardsFromRandomButtons:
+            cardsToRemove.append(card)
+    
+    
     if len(cardsToRemove) > 0:
         # print("Fulldeck: ", cardsLeft)
         # print("Cards to remove from fulldeck: ", cardsToRemove)
@@ -749,7 +767,7 @@ def calculate_flush_points(Hand):
 
 def calculate_full_house_points(Hand):
     fullhousesum = 0
-    if is_three_of_kind(Hand) == True:
+    if is_full_house(Hand) == True:
         fullhousesum = fullhousesum + FULLHOUSEPOINTS
     print("Full house points: ",fullhousesum)
     return fullhousesum
@@ -1346,7 +1364,7 @@ buttonCal = tk.Button(MainWindow, text="Calc possible hands", command=lambda:cal
 
 buttonCal = tk.Button(MainWindow, text="Update++ cards", command=lambda:update_hand_and_left_cards()).grid(row=2, column=2 + SHIFTBETWEENCARDS * 8)
 
-buttonCal = tk.Button(MainWindow, text="Random++ hand", command=lambda:random_hand_and_update_left_cards(RANDOMDRAWAMOUNT)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 8)
+buttonCal = tk.Button(MainWindow, text="Random++ hand", command=lambda:random_hand_and_update_left_cards(RANDOMDRAWAMOUNT)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 9)
 
 
 MainWindow.mainloop()
