@@ -77,7 +77,17 @@ DOUBLEPAIRPOINTS = 1500
 
 TRIOPOINTS = 3000
 
+STRAIGHTPOINTS = 5000
 
+FLUSHPOINTS = 7000
+
+FULLHOUSEPOINTS = 9000
+
+FOURPOINTS = 10000
+
+STRAIGHTFLUSHPOINTS = 12012
+
+ROYALFLUSHPOINTS = 15000
 
 
 
@@ -471,22 +481,43 @@ def calculate_points_for_possible_hands(Hand,pickedRandomCards):
     """This func will calculate final points for possible hand combinations"""
     possibleHands = create_hand_with_random_cards_on_the_table(Hand,pickedRandomCards)
     for i in range(0, len(possibleHands),1):
+        print("Calculating for this possible hand",possibleHands[i])
         calculate_points_for_hand(possibleHands[i])
     return
 
 
 def calculate_points_for_hand(Hand):
     """"This func calculate points for hand"""
-    calculate_single_points(Hand)
-    calculate_pair_points(Hand)
-    calculate_double_pair_points(Hand)
-    calculate_trio_points(Hand)
+    sumlist = []
+    # print("Calculacion start!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    # print(Hand)
+    sumlist.append(calculate_single_points(Hand))
+    sumlist.append(calculate_pair_points(Hand))
+    sumlist.append(calculate_double_pair_points(Hand))
+    sumlist.append(calculate_trio_points(Hand))
+    
+    sumlist.append(calculate_straight_points(Hand))
+    sumlist.append(calculate_flush_points(Hand))
+    sumlist.append(calculate_full_house_points(Hand))
+    sumlist.append(calculate_four_points(Hand))
+    sumlist.append(calculate_straight_flush_points(Hand))
+    sumlist.append(calculate_royal_flush_points(Hand))
+    
+    # print("???????????????",Hand)
+
+    totalsum = sum(sumlist)
+    print("Total points for this hand= ",totalsum)
     return
 
 
 
 
     
+
+
+
+
+
 
 
 
@@ -533,7 +564,7 @@ def is_straight(hand):
         hand.sort(key=operator.attrgetter("rank"))
         start = hand[0].rank
         straight = [Card(r, None) for r in range(start, start+6)]
-        print(straight)
+        # print(straight)
         return all(got.rank == want.rank for got,want in zip(hand, straight))
 
 
@@ -680,7 +711,7 @@ def calculate_pair_points(Hand):
     pairsum = 0
     if is_pair(Hand) == True:
         pairsum = pairsum + PAIRPOINTS
-    print(pairsum)
+    print("Pair points: ",pairsum)
     return pairsum
 
 
@@ -689,15 +720,84 @@ def calculate_double_pair_points(Hand):
     doublepairsum = 0
     if is_two_pair(Hand) == True:
         doublepairsum = doublepairsum + DOUBLEPAIRPOINTS
-    print(doublepairsum)
+    print("Double pair points: ",doublepairsum)
     return doublepairsum
 
 def calculate_trio_points(Hand):
     triosum = 0
     if is_three_of_kind(Hand) == True:
         triosum = triosum + TRIOPOINTS
-    print(triosum)
+    print("Trio points: ",triosum)
     return triosum
+
+
+def calculate_straight_points(Hand):
+    straightsum = 0
+    if is_straight(Hand) == True:
+        straightsum = straightsum + STRAIGHTPOINTS
+    print("Straight points: ",straightsum)
+    return straightsum
+
+
+def calculate_flush_points(Hand):
+    flushsum = 0
+    if is_flush(Hand) == True:
+        flushsum = flushsum + FLUSHPOINTS
+    print("Flush points: ",flushsum)
+    return flushsum
+
+
+def calculate_full_house_points(Hand):
+    fullhousesum = 0
+    if is_three_of_kind(Hand) == True:
+        fullhousesum = fullhousesum + FULLHOUSEPOINTS
+    print("Full house points: ",fullhousesum)
+    return fullhousesum
+
+
+def calculate_four_points(Hand):
+    foursum = 0
+    if is_four_of_kind(Hand) == True:
+        foursum = foursum + FOURPOINTS
+    print("Four points: ",foursum)
+    return foursum
+
+
+def calculate_straight_flush_points(Hand):
+    straightflushsum = 0
+    if is_straightflush(Hand) == True:
+        straightflushsum = straightflushsum + STRAIGHTFLUSHPOINTS
+    print("Straight flush points: ",straightflushsum)
+    return straightflushsum
+
+
+def calculate_royal_flush_points(Hand):
+    royalflushsum = 0
+    if is_royalflush(Hand) == True:
+        royalflushsum = royalflushsum + ROYALFLUSHPOINTS
+    print("Royal flush points: ",royalflushsum)
+    return royalflushsum
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
