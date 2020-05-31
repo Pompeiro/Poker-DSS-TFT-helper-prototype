@@ -62,6 +62,8 @@ RANDOMLYPICKEDCARDCOUNTER = 0
 RANDOMDRAWAMOUNT = 4
 
 
+DEFAULTRANDOMCARDSTOPICKAMOUNT = 5
+
 ############## POINTS CONSTANTS
 
 
@@ -315,6 +317,8 @@ counterPA=tk.IntVar()
 ############## Counter for amount of random cards to pick
 counterRandomCardsToPick=tk.IntVar()
 
+
+counterRandomCardsToPick.set(DEFAULTRANDOMCARDSTOPICKAMOUNT)
 
 ############### COUNTERS IN THE BOX
 
