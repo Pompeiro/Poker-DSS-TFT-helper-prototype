@@ -28,6 +28,11 @@ import operator
 import pandas as pd
 
 
+import skfuzzy as fuzz
+from skfuzzy import control as ctrl
+import numpy as np
+
+
 ######## cheat sheet for namedtuple Card
 """
 cardsLeft[0].suit.name
@@ -340,6 +345,23 @@ counterRandomCardsToPick=tk.IntVar()
 
 counterRandomCardsToPick.set(DEFAULTRANDOMCARDSTOPICKAMOUNT)
 
+
+
+
+################### Counters for preferences
+
+counterPreferencesHearts=tk.IntVar()
+counterPreferencesTiles=tk.IntVar()
+counterPreferencesClovers=tk.IntVar()
+counterPreferencesPikes=tk.IntVar()
+
+
+
+
+
+
+
+
 ############### COUNTERS IN THE BOX
 
 box_counter = [counterH9, counterH10, counterHJ, counterHQ, counterHK, counterHA,
@@ -348,6 +370,13 @@ box_counter = [counterH9, counterH10, counterHJ, counterHQ, counterHK, counterHA
                counterP9, counterP10, counterPJ, counterPQ, counterPK, counterPA,]
 
 
+
+
+
+################# Counters for preferences in the box
+
+box_preferences_counter = [counterPreferencesHearts,counterPreferencesTiles,
+                           counterPreferencesClovers,counterPreferencesPikes]
 
 
 
@@ -948,7 +977,13 @@ def add(intVariable):
     intVariable.set(intVariable.get() + 1)
     return
     
+ 
     
+def add(intVariable,maximum=1):
+    if intVariable.get() < maximum:
+        intVariable.set(intVariable.get() + 1)
+    return
+
     
     
 def add_with_button_highlight_after_click(intVariable,widget):
@@ -990,22 +1025,16 @@ labelTitle = tk.Label(MainWindow, text="Hearts").grid(row=0, column=2)
 
 
 labelNum9 = tk.Label(MainWindow, text="9").grid(row=1, column=0)
-nineEntry = tk.Entry(MainWindow)
 
 labelNum10 = tk.Label(MainWindow, text="10").grid(row=2, column=0)
-HtenEntry = tk.Entry(MainWindow)
 
 labelNumJ = tk.Label(MainWindow, text="J").grid(row=3, column=0)
-HjackEntry = tk.Entry(MainWindow)
 
 labelNumQ = tk.Label(MainWindow, text="Q").grid(row=4, column=0)
-HquuenEntry = tk.Entry(MainWindow)
 
 labelNumK = tk.Label(MainWindow, text="K").grid(row=5, column=0)
-HkingEntry = tk.Entry(MainWindow)
 
 labelNumA = tk.Label(MainWindow, text="A").grid(row=6, column=0)
-HaceEntry = tk.Entry(MainWindow)
 
 
 ##############################
@@ -1019,22 +1048,16 @@ labelTitle = tk.Label(MainWindow, text="TILES").grid(row=0, column=2 + SHIFTBETW
 
 
 labelNum9 = tk.Label(MainWindow, text="9").grid(row=1, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
-TnineEntry = tk.Entry(MainWindow)
 
 labelNum10 = tk.Label(MainWindow, text="10").grid(row=2, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES )
-TtenEntry = tk.Entry(MainWindow)
 
 labelNumJ = tk.Label(MainWindow, text="J").grid(row=3, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES) 
-TjackEntry = tk.Entry(MainWindow)
 
 labelNumQ = tk.Label(MainWindow, text="Q").grid(row=4, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
-TquuenEntry = tk.Entry(MainWindow)
 
 labelNumK = tk.Label(MainWindow, text="K").grid(row=5, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
-TkingEntry = tk.Entry(MainWindow)
 
 labelNumA = tk.Label(MainWindow, text="A").grid(row=6, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
-TaceEntry = tk.Entry(MainWindow)
 
 
 ##############################
@@ -1445,6 +1468,121 @@ buttonCal = tk.Button(MainWindow, text="Random++ hand", command=lambda:random_ha
 
 
 buttonCal = tk.Button(MainWindow, text="Show possible hands++", command=lambda:show_possible_hands_as_button_with_points(hand,pickedRandomCards,6)).grid(row=7, column=2 + 2*SHIFTBETWEENCARDS )
+
+
+
+
+
+
+
+
+
+
+
+
+
+################### FUZZY LOGIC BRO
+
+
+
+
+
+def calculate_fuzzy_scope():
+    fSuits = ctrl.Antecedent(np.arange(0, 4.5, 0.1), 'fSuits')
+    
+    
+    
+    fPoints = ctrl.Consequent(np.arange(0, 100, 0.1), 'fPoints')
+    fSuits['hearts'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, counterPreferencesHearts.get())
+    fSuits['tiles'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, counterPreferencesTiles.get())
+    fSuits['clovers'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, counterPreferencesClovers.get())
+    fSuits['pikes'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, counterPreferencesPikes.get())
+    
+    
+    
+    
+    
+    
+    fPoints.automf(5)
+    rule1 = ctrl.Rule(fSuits['hearts'], fPoints['poor'])
+    rule2 = ctrl.Rule(fSuits['tiles'], fPoints['mediocre'])
+    rule3 = ctrl.Rule(fSuits['clovers'], fPoints['average'])
+    rule4 = ctrl.Rule(fSuits['pikes'], fPoints['decent'])
+    
+    
+    
+    
+    
+    suitsPreferencesRulebase = ctrl.ControlSystem([rule1, rule2, rule3, rule4])
+    
+    
+    
+    
+    
+    
+    suitsPreferences = ctrl.ControlSystemSimulation(suitsPreferencesRulebase)
+    
+    
+    for i in range(1,5):
+    
+        suitsPreferences.input['fSuits'] = i
+        suitsPreferences.compute()
+        
+        
+        Crisp = suitsPreferences.output['fPoints']
+        print(Crisp,i)
+    return
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def create_window():
+    window = tk.Toplevel(MainWindow)
+    labelTitle = tk.Label(window, text="Preferences").grid(row=0, column=2)
+    
+    
+    labelNum9 = tk.Label(window, text="Hearts").grid(row=1, column=0)
+    
+    labelNum10 = tk.Label(window, text="Tiles").grid(row=2, column=0)
+    
+    labelNumJ = tk.Label(window, text="Clovers").grid(row=3, column=0)
+    
+    labelNumQ = tk.Label(window, text="Pikes").grid(row=4, column=0)
+    
+
+    
+    
+    for i,name in enumerate(box_preferences_counter):
+        maximum=len(box_preferences_counter)
+    
+        entryNumH9 = tk.Entry(window, textvariable=name, width = 4).grid(row=i+1, column=2)
+
+        buttonCal = tk.Button(window, text="+", command=lambda name=name:add(name,maximum)).grid(row=i+1, column=3)
+        buttonCal = tk.Button(window, text="-", command=lambda name = name:sub(name)).grid(row=i+1, column=4)
+        name.set(i+1)
+
+
+    
+    
+
+    return 
+
+b = tk.Button(MainWindow, text="Preferences settings", command=create_window).grid(row=7,column=4 * SHIFTBETWEENCARDS)
+
+
+b = tk.Button(MainWindow, text="Fuzzy Logic", command=calculate_fuzzy_scope).grid(row=7,column=5 * SHIFTBETWEENCARDS)
+
 
 
 
