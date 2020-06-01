@@ -83,11 +83,11 @@ FLUSHPOINTS = 7000
 
 FULLHOUSEPOINTS = 9000
 
-FOURPOINTS = 10000
+FOURPOINTS = 13000
 
-STRAIGHTFLUSHPOINTS = 12012
+STRAIGHTFLUSHPOINTS = 16012
 
-ROYALFLUSHPOINTS = 15000
+ROYALFLUSHPOINTS = 17000
 
 
 
@@ -257,7 +257,7 @@ FULLDECKSTRING = [CARDDICTH["H9"], CARDDICTH["H10"], CARDDICTH["HJ"], CARDDICTH[
 
 
 MainWindow = tk.Tk()
-MainWindow.geometry('1200x800')
+MainWindow.geometry('1600x800')
 MainWindow.title('Advanced DSS card game calculator')
 
 
@@ -1064,7 +1064,6 @@ labelTitle = tk.Label(MainWindow, text="Random Cards Amount").grid(row=0, column
 
 
 
-labelTitle = tk.Label(MainWindow, text="Combo checking").grid(row=0, column=2 + SHIFTBETWEENCARDS * 5)
 
 
 
@@ -1085,7 +1084,7 @@ labelTitle = tk.Label(MainWindow, text="Possible hands check").grid(row=0, colum
 
 
 
-labelTitle = tk.Label(MainWindow, text="++ as update left cards").grid(row=0, column=2 + SHIFTBETWEENCARDS * 8)
+labelTitle = tk.Label(MainWindow, text="++ as multitask").grid(row=0, column=2 + SHIFTBETWEENCARDS * 5)
 
 
 
@@ -1099,6 +1098,7 @@ labelTitle = tk.Label(MainWindow, text="++ as update left cards").grid(row=0, co
 
 
 
+labelTitle = tk.Label(MainWindow, text="Combo checking").grid(row=0, column=2 + SHIFTBETWEENCARDS * 8)
 
 
 
@@ -1335,19 +1335,12 @@ pick_random_card_from_left_cards = partial(pick_random_card_from_left_cards, car
 
 
 
-########### BUTTONS RESPONSIBLE FOR LOGIC AND POINTS
+########### BUTTONS RESPONSIBLE FOR LOGIC AND POINTS RIGHT PANEL
 
 
+buttonCal = tk.Button(MainWindow, text="Update++ cards", command=lambda:update_hand_and_left_cards()).grid(row=2, column=2 + SHIFTBETWEENCARDS * 5)
 
-buttonCal = tk.Button(MainWindow, text="single", command=lambda:show_single_points(calculate_single_points(hand))).grid(row=1, column=2 + SHIFTBETWEENCARDS * 5)
-
-buttonCal = tk.Button(MainWindow, text="pair", command=lambda:show_pair_points(calculate_pair_points(hand))).grid(row=2, column=2 + SHIFTBETWEENCARDS * 5)
-
-
-buttonCal = tk.Button(MainWindow, text="doublepair", command=lambda:show_double_pair_points(calculate_double_pair_points(hand))).grid(row=3, column=2 + SHIFTBETWEENCARDS * 5)
-
-buttonCal = tk.Button(MainWindow, text="trio", command=lambda:show_trio_points(calculate_trio_points(hand))).grid(row=4, column=2 + SHIFTBETWEENCARDS * 5)
-
+buttonCal = tk.Button(MainWindow, text="Random++ hand", command=lambda:random_hand_and_update_left_cards(RANDOMDRAWAMOUNT)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 5)
 
 
 buttonCal = tk.Button(MainWindow, text="Update left cards", command=lambda:update_left_cards_in_deck()).grid(row=2, column=2 + SHIFTBETWEENCARDS * 6)
@@ -1382,9 +1375,32 @@ buttonCal = tk.Button(MainWindow, text="Show possible hands++", command=lambda:s
 
 
 
-buttonCal = tk.Button(MainWindow, text="Update++ cards", command=lambda:update_hand_and_left_cards()).grid(row=2, column=2 + SHIFTBETWEENCARDS * 8)
 
-buttonCal = tk.Button(MainWindow, text="Random++ hand", command=lambda:random_hand_and_update_left_cards(RANDOMDRAWAMOUNT)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 9)
+
+buttonCal = tk.Button(MainWindow, text="single", command=lambda:show_single_points(calculate_single_points(hand))).grid(row=1, column=2 + SHIFTBETWEENCARDS * 8)
+
+buttonCal = tk.Button(MainWindow, text="pair", command=lambda:show_pair_points(calculate_pair_points(hand))).grid(row=2, column=2 + SHIFTBETWEENCARDS * 8)
+
+
+buttonCal = tk.Button(MainWindow, text="doublepair", command=lambda:show_double_pair_points(calculate_double_pair_points(hand))).grid(row=3, column=2 + SHIFTBETWEENCARDS * 8)
+
+buttonCal = tk.Button(MainWindow, text="trio", command=lambda:show_trio_points(calculate_trio_points(hand))).grid(row=4, column=2 + SHIFTBETWEENCARDS * 8)
+
+
+############################3 DOWN PANEL
+
+
+
+
+buttonCal = tk.Button(MainWindow, text="Random cards", command=pick_random_card_from_left_cards).grid(row=7, column=2 )
+
+
+
+buttonCal = tk.Button(MainWindow, text="Random++ hand", command=lambda:random_hand_and_update_left_cards(RANDOMDRAWAMOUNT)).grid(row=7, column=2 + SHIFTBETWEENCARDS )
+
+
+
+buttonCal = tk.Button(MainWindow, text="Show possible hands++", command=lambda:show_possible_hands_as_button_with_points(hand,pickedRandomCards,6)).grid(row=7, column=2 + 2*SHIFTBETWEENCARDS )
 
 
 
