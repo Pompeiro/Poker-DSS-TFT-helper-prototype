@@ -721,15 +721,38 @@ def pick_random_card_from_left_cards(cardsLeft):
         RANDOMLYPICKEDCARDCOUNTER =  RANDOMLYPICKEDCARDCOUNTER + 1
         Random_card_from_left_cards = cardsLeft[random.randint(0, (len(cardsLeft)-1))]
         print(Random_card_from_left_cards)
-        buttonCal = tk.Button(MainWindow, text=(Random_card_from_left_cards.rank.name +' ' + Random_card_from_left_cards.suit.name), command=lambda Random_card_from_left_cards = Random_card_from_left_cards:add(select_counter(Random_card_from_left_cards))).grid(row=15, column=RANDOMLYPICKEDCARDCOUNTER)
+        # buttonCal = tk.Button(MainWindow, text=(Random_card_from_left_cards.rank.name +' ' + Random_card_from_left_cards.suit.name), command=lambda Random_card_from_left_cards = Random_card_from_left_cards:add(select_counter(Random_card_from_left_cards))).grid(row=15, column=RANDOMLYPICKEDCARDCOUNTER)
         cardsLeft.remove(Random_card_from_left_cards)
         pickedRandomCards.append(Random_card_from_left_cards)
+        
+    show_card_as_button_with_add_counter_when_clicked(pickedRandomCards)
     return 
 
 
+previously_clicked=None
+def show_card_as_button_with_add_counter_when_clicked(cards):
+    for i, card in enumerate(cards, 2):
+        btn = tk.Button(MainWindow, text=(card.rank.name + ' ' + card.suit.name))
+        u=select_counter(card)
+        btn.config(command=lambda u=u:add(u))
+    
+        btn.grid(row=15, column=i, sticky='w')
+        
+    return
 
 
 
+
+
+def show_card_as_button_with_add_counter_when_clicked_with_highlight(cards):
+    for i, card in enumerate(cards, 2):
+        btn = tk.Button(MainWindow, text=(card.rank.name + ' ' + card.suit.name))
+        u=select_counter(card)
+        btn.config(command=lambda u=u,arg=btn:add_with_button_highlight_after_click(u,arg))
+    
+        btn.grid(row=15, column=i, sticky='w')
+        
+    return
 
 
 ###################### POINTS MEASURE
@@ -923,7 +946,26 @@ def check_value(label_result, stringVariable):
 
 def add(intVariable):
     intVariable.set(intVariable.get() + 1)
+    return
     
+    
+    
+    
+def add_with_button_highlight_after_click(intVariable,widget):
+    intVariable.set(intVariable.get() + 1)
+    global previously_clicked
+
+    if previously_clicked:
+        previously_clicked['bg'] = widget['bg']
+        previously_clicked['activebackground'] = widget['activebackground']
+        previously_clicked['relief'] = widget['relief']
+
+    widget['bg'] = 'green'
+    widget['activebackground'] = 'green'
+    widget['relief'] = 'sunken'
+
+    previously_clicked = widget
+    return
     
 def sub(intVariable):
     if intVariable.get() >0:
