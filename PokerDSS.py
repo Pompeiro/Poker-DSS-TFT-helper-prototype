@@ -25,7 +25,7 @@ import operator
 
 
 
-
+import pandas as pd
 
 
 ######## cheat sheet for namedtuple Card
@@ -554,6 +554,8 @@ def show_card_as_button(cardsToBeButtons,rowOffset, textDescribingWhatIsOnTheBut
     for i in range(0,len(cardsToBeButtons),1):
         # print("Thats the input to add",select_counter(cardsLeft[i]))
         buttonCal = tk.Button(MainWindow, text=(cardsToBeButtons[i].rank.name +' ' + cardsToBeButtons[i].suit.name), command=lambda i = i:add(select_counter(cardsToBeButtons[i]))).grid(row=12+rowOffset, column=i+3)
+        
+    print(pd.DataFrame(cardsToBeButtons, columns=Card._fields))
     return
 
 
