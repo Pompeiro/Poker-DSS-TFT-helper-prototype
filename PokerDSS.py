@@ -50,6 +50,13 @@ Out[25]: 1
 
 
 
+u=fPoints.terms.keys()
+
+
+y=list(u)
+
+and then in y all fuzzy variables are stored like poor mediocre etc
+
 
 
 my god, dont use append when u want local changes because it affects global scope
@@ -96,9 +103,12 @@ ROYALFLUSHPOINTS = 17000
 
 
 
+#### initialize preference points for 4 suits(+1 empty space in list)
+PreferencePoints = [0] * 5
 
 
 
+prefered = [] ##### suits to be prefered
 
 
 
@@ -789,7 +799,7 @@ def show_card_as_button_with_add_counter_when_clicked_with_highlight(cards):
 def calculate_single_points(Hand):
     singlesum = 0
     for i in range(0,len(Hand),1):
-        singlesum = singlesum + Hand[i].rank.value
+        singlesum = singlesum + Hand[i].rank.value + PreferencePoints[Hand[i].suit.value]
     print("Single points: ",singlesum)
     return singlesum
 
@@ -1007,6 +1017,28 @@ def sub(intVariable):
         intVariable.set(intVariable.get() - 1)
     
     
+
+
+
+
+
+
+
+def save_preferences_and_close_window():
+    global prefered
+    preferedLocal = []
+    for i in range(0,4):
+        if box_preferences_counter[i].get() == 1:
+            preferedLocal = preferedLocal +[i]
+    prefered = list(set(preferedLocal))        
+    window.destroy()
+    return
+
+
+
+
+
+
 
 
 
@@ -1488,49 +1520,105 @@ buttonCal = tk.Button(MainWindow, text="Show possible hands++", command=lambda:s
 
 
 def calculate_fuzzy_scope():
-    fSuits = ctrl.Antecedent(np.arange(0, 4.5, 0.1), 'fSuits')
+    global PreferencePoints
+
+    fSuits = ctrl.Antecedent(np.arange(0, 4.5, 0.001), 'fSuits')
+    
+    pointsMaximum=20
+    
+    fPoints = ctrl.Consequent(np.arange(0, pointsMaximum, 0.1), 'fPoints')
+    
+    
+    #### fuzzy inputs
+    
+    
+    fPoints['poor'] = fuzz.gbellmf(fPoints.universe, 0.025, 0.95, pointsMaximum/5)
+    fPoints['mediocre'] = fuzz.gbellmf(fPoints.universe, 0.025, 0.95, pointsMaximum*2/5)
+    fPoints['average'] = fuzz.gbellmf(fPoints.universe, 0.025, 0.95, pointsMaximum*3/5)
+    fPoints['decent'] = fuzz.gbellmf(fPoints.universe, 0.025, 0.95, pointsMaximum*4/5)
+    
+    
+    #### fuzzy outputs
     
     
     
-    fPoints = ctrl.Consequent(np.arange(0, 100, 0.1), 'fPoints')
-    fSuits['hearts'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, counterPreferencesHearts.get())
-    fSuits['tiles'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, counterPreferencesTiles.get())
-    fSuits['clovers'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, counterPreferencesClovers.get())
-    fSuits['pikes'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, counterPreferencesPikes.get())
+    fSuits['hearts'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, 1)
+    fSuits['tiles'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, 2)
+    fSuits['clovers'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, 3)
+    fSuits['pikes'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, 4)
+    # fPoints.automf(5)
+    
+    
+    
+    orderedFInput = list(fSuits.terms.values())
+    
+    
+    
+    
+    orderedFOutput = list(fPoints.terms.values())
+    
+    
+    
+    
+    
+    rulez=[]
+    for i,name in enumerate(orderedFInput):
+        if any(i==x for x in prefered):
+            rulez.append(ctrl.Rule(orderedFInput[i], orderedFOutput[3]))
+            print(i)
+        else:
+            rulez.append(ctrl.Rule(orderedFInput[i], orderedFOutput[0]))
     
     
     
     
     
     
-    fPoints.automf(5)
-    rule1 = ctrl.Rule(fSuits['hearts'], fPoints['poor'])
-    rule2 = ctrl.Rule(fSuits['tiles'], fPoints['mediocre'])
-    rule3 = ctrl.Rule(fSuits['clovers'], fPoints['average'])
-    rule4 = ctrl.Rule(fSuits['pikes'], fPoints['decent'])
     
     
     
     
     
-    suitsPreferencesRulebase = ctrl.ControlSystem([rule1, rule2, rule3, rule4])
+    rule1 = ctrl.Rule(fSuits['hearts'], orderedFOutput[0])
+    rule2 = ctrl.Rule(fSuits['tiles'], orderedFOutput[0])
+    rule3 = ctrl.Rule(fSuits['clovers'], orderedFOutput[0])
+    rule4 = ctrl.Rule(fSuits['pikes'], orderedFOutput[0])
+    
+    rules = [rule1, rule2, rule3, rule4]
     
     
     
     
     
+    suitsPreferencesRulebase = ctrl.ControlSystem(rulez)
     
+    
+        
+    
+        
+        
+        
+        
+    
+        
     suitsPreferences = ctrl.ControlSystemSimulation(suitsPreferencesRulebase)
+    
+    
+    
+    
     
     
     for i in range(1,5):
     
+        
+        
+        
         suitsPreferences.input['fSuits'] = i
         suitsPreferences.compute()
         
         
-        Crisp = suitsPreferences.output['fPoints']
-        print(Crisp,i)
+        PreferencePoints[i] = int(suitsPreferences.output['fPoints'])
+
     return
 
 
@@ -1548,6 +1636,7 @@ def calculate_fuzzy_scope():
 
 
 def create_window():
+    global window
     window = tk.Toplevel(MainWindow)
     labelTitle = tk.Label(window, text="Preferences").grid(row=0, column=2)
     
@@ -1564,24 +1653,26 @@ def create_window():
     
     
     for i,name in enumerate(box_preferences_counter):
-        maximum=len(box_preferences_counter)
+        maximum=1
     
         entryNumH9 = tk.Entry(window, textvariable=name, width = 4).grid(row=i+1, column=2)
 
         buttonCal = tk.Button(window, text="+", command=lambda name=name:add(name,maximum)).grid(row=i+1, column=3)
         buttonCal = tk.Button(window, text="-", command=lambda name = name:sub(name)).grid(row=i+1, column=4)
-        name.set(i+1)
 
 
     
     
+    buttonCal = tk.Button(window, text="save&quit", command=save_preferences_and_close_window).grid(row=5, column=2)
 
     return 
 
 b = tk.Button(MainWindow, text="Preferences settings", command=create_window).grid(row=7,column=4 * SHIFTBETWEENCARDS)
 
 
-b = tk.Button(MainWindow, text="Fuzzy Logic", command=calculate_fuzzy_scope).grid(row=7,column=5 * SHIFTBETWEENCARDS)
+b = tk.Button(MainWindow, text="Calc preferences points", command=calculate_fuzzy_scope).grid(row=7,column=5 * SHIFTBETWEENCARDS)
+
+
 
 
 
