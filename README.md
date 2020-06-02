@@ -19,3 +19,6 @@ Future if i dont give up.
 In the next stages I want to add Neural Network as a sensor which will replace user in collecting info about battlefield.
 Also I am thinking about using match history as a brain of DSS.
 Or at the end I will prepare bot playing TFT.
+
+![](https://user-images.githubusercontent.com/60773657/83512398-6ef62780-a4d0-11ea-802c-6282ceec220e.jpg "Results")
+
