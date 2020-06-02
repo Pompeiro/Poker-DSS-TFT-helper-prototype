@@ -25,7 +25,12 @@ import operator
 
 
 
+import pandas as pd
 
+
+import skfuzzy as fuzz
+from skfuzzy import control as ctrl
+import numpy as np
 
 
 ######## cheat sheet for namedtuple Card
@@ -45,6 +50,13 @@ Out[25]: 1
 
 
 
+u=fPoints.terms.keys()
+
+
+y=list(u)
+
+and then in y all fuzzy variables are stored like poor mediocre etc
+
 
 
 my god, dont use append when u want local changes because it affects global scope
@@ -55,6 +67,7 @@ my god, dont use append when u want local changes because it affects global scop
 SHIFTBETWEENCARDS = 8
 SHIFTADJUSTMENT = 1
 PADXBETWEENCARDNAMES = 20
+PADYBETWEENCARDNAMES = 10
 
 
 RANDOMLYPICKEDCARDCOUNTER = 0
@@ -83,17 +96,20 @@ FLUSHPOINTS = 7000
 
 FULLHOUSEPOINTS = 9000
 
-FOURPOINTS = 10000
+FOURPOINTS = 13000
 
-STRAIGHTFLUSHPOINTS = 12012
+STRAIGHTFLUSHPOINTS = 16012
 
-ROYALFLUSHPOINTS = 15000
-
-
+ROYALFLUSHPOINTS = 17000
 
 
 
+#### initialize preference points for 4 suits(+1 empty space in list)
+PreferencePoints = [0] * 5
 
+
+
+prefered = [] ##### suits to be prefered
 
 
 
@@ -257,7 +273,7 @@ FULLDECKSTRING = [CARDDICTH["H9"], CARDDICTH["H10"], CARDDICTH["HJ"], CARDDICTH[
 
 
 MainWindow = tk.Tk()
-MainWindow.geometry('1200x800')
+MainWindow.geometry('1600x800')
 MainWindow.title('Advanced DSS card game calculator')
 
 
@@ -340,6 +356,23 @@ counterRandomCardsToPick=tk.IntVar()
 
 counterRandomCardsToPick.set(DEFAULTRANDOMCARDSTOPICKAMOUNT)
 
+
+
+
+################### Counters for preferences
+
+counterPreferencesHearts=tk.IntVar()
+counterPreferencesTiles=tk.IntVar()
+counterPreferencesClovers=tk.IntVar()
+counterPreferencesPikes=tk.IntVar()
+
+
+
+
+
+
+
+
 ############### COUNTERS IN THE BOX
 
 box_counter = [counterH9, counterH10, counterHJ, counterHQ, counterHK, counterHA,
@@ -348,6 +381,13 @@ box_counter = [counterH9, counterH10, counterHJ, counterHQ, counterHK, counterHA
                counterP9, counterP10, counterPJ, counterPQ, counterPK, counterPA,]
 
 
+
+
+
+################# Counters for preferences in the box
+
+box_preferences_counter = [counterPreferencesHearts,counterPreferencesTiles,
+                           counterPreferencesClovers,counterPreferencesPikes]
 
 
 
@@ -419,6 +459,13 @@ def update_hand_and_left_cards():
     return
 
 
+
+def update_and_show_hand_and_left_cards():
+    """"Use of update hand + update left cards in deck functions"""
+    update_left_cards_in_deck()
+    update_hand()
+    show_card_as_button(hand,5,"Current hand")
+    return
 
 
 
@@ -495,7 +542,7 @@ def show_possible_hands_as_button_with_points(Hand,pickedRandomCards,rowOffset):
     for i in range(0, len(possibleHands),1):
         show_card_as_button(possibleHands[i],rowOffset+i,("Possible hands %s"%i))
         
-        labelTitle = tk.Label(MainWindow, text="Total Points: %s"%PointsForThisPossibleHand[i]).grid(row=12+rowOffset+i, column=12)
+        labelTitle = tk.Label(MainWindow, text="Total Points: %s"%PointsForThisPossibleHand[i]).grid(row=12+rowOffset+i, column=12, pady = PADYBETWEENCARDNAMES)
 
     return
 
@@ -554,6 +601,8 @@ def show_card_as_button(cardsToBeButtons,rowOffset, textDescribingWhatIsOnTheBut
     for i in range(0,len(cardsToBeButtons),1):
         # print("Thats the input to add",select_counter(cardsLeft[i]))
         buttonCal = tk.Button(MainWindow, text=(cardsToBeButtons[i].rank.name +' ' + cardsToBeButtons[i].suit.name), command=lambda i = i:add(select_counter(cardsToBeButtons[i]))).grid(row=12+rowOffset, column=i+3)
+        
+    print(pd.DataFrame(cardsToBeButtons, columns=Card._fields))
     return
 
 
@@ -719,15 +768,38 @@ def pick_random_card_from_left_cards(cardsLeft):
         RANDOMLYPICKEDCARDCOUNTER =  RANDOMLYPICKEDCARDCOUNTER + 1
         Random_card_from_left_cards = cardsLeft[random.randint(0, (len(cardsLeft)-1))]
         print(Random_card_from_left_cards)
-        buttonCal = tk.Button(MainWindow, text=(Random_card_from_left_cards.rank.name +' ' + Random_card_from_left_cards.suit.name), command=lambda Random_card_from_left_cards = Random_card_from_left_cards:add(select_counter(Random_card_from_left_cards))).grid(row=15, column=RANDOMLYPICKEDCARDCOUNTER)
+        # buttonCal = tk.Button(MainWindow, text=(Random_card_from_left_cards.rank.name +' ' + Random_card_from_left_cards.suit.name), command=lambda Random_card_from_left_cards = Random_card_from_left_cards:add(select_counter(Random_card_from_left_cards))).grid(row=15, column=RANDOMLYPICKEDCARDCOUNTER)
         cardsLeft.remove(Random_card_from_left_cards)
         pickedRandomCards.append(Random_card_from_left_cards)
+        
+    show_card_as_button_with_add_counter_when_clicked(pickedRandomCards)
     return 
 
 
+previously_clicked=None
+def show_card_as_button_with_add_counter_when_clicked(cards):
+    for i, card in enumerate(cards, 2):
+        btn = tk.Button(MainWindow, text=(card.rank.name + ' ' + card.suit.name))
+        u=select_counter(card)
+        btn.config(command=lambda u=u:add(u))
+    
+        btn.grid(row=15, column=i, sticky='w')
+        
+    return
 
 
 
+
+
+def show_card_as_button_with_add_counter_when_clicked_with_highlight(cards):
+    for i, card in enumerate(cards, 2):
+        btn = tk.Button(MainWindow, text=(card.rank.name + ' ' + card.suit.name))
+        u=select_counter(card)
+        btn.config(command=lambda u=u,arg=btn:add_with_button_highlight_after_click(u,arg))
+    
+        btn.grid(row=15, column=i, sticky='w')
+        
+    return
 
 
 ###################### POINTS MEASURE
@@ -735,7 +807,7 @@ def pick_random_card_from_left_cards(cardsLeft):
 def calculate_single_points(Hand):
     singlesum = 0
     for i in range(0,len(Hand),1):
-        singlesum = singlesum + Hand[i].rank.value
+        singlesum = singlesum + Hand[i].rank.value + PreferencePoints[Hand[i].suit.value]
     print("Single points: ",singlesum)
     return singlesum
 
@@ -921,13 +993,221 @@ def check_value(label_result, stringVariable):
 
 def add(intVariable):
     intVariable.set(intVariable.get() + 1)
+    return
     
+ 
+    
+def add(intVariable,maximum=1):
+    if intVariable.get() < maximum:
+        intVariable.set(intVariable.get() + 1)
+    return
+
+    
+    
+def add_with_button_highlight_after_click(intVariable,widget):
+    intVariable.set(intVariable.get() + 1)
+    global previously_clicked
+
+    if previously_clicked:
+        previously_clicked['bg'] = widget['bg']
+        previously_clicked['activebackground'] = widget['activebackground']
+        previously_clicked['relief'] = widget['relief']
+
+    widget['bg'] = 'green'
+    widget['activebackground'] = 'green'
+    widget['relief'] = 'sunken'
+
+    previously_clicked = widget
+    return
     
 def sub(intVariable):
     if intVariable.get() >0:
         intVariable.set(intVariable.get() - 1)
     
     
+
+
+
+################### FUZZY LOGIC BRO
+
+
+
+
+
+def calculate_fuzzy_scope():
+    global PreferencePoints
+
+    fSuits = ctrl.Antecedent(np.arange(0, 4.5, 0.001), 'fSuits')
+    
+    pointsMaximum=20
+    
+    fPoints = ctrl.Consequent(np.arange(0, pointsMaximum, 0.1), 'fPoints')
+    
+    
+    #### fuzzy inputs
+    
+    
+    fPoints['poor'] = fuzz.gbellmf(fPoints.universe, 0.025, 0.95, pointsMaximum/5)
+    fPoints['mediocre'] = fuzz.gbellmf(fPoints.universe, 0.025, 0.95, pointsMaximum*2/5)
+    fPoints['average'] = fuzz.gbellmf(fPoints.universe, 0.025, 0.95, pointsMaximum*3/5)
+    fPoints['decent'] = fuzz.gbellmf(fPoints.universe, 0.025, 0.95, pointsMaximum*4/5)
+    
+    
+    #### fuzzy outputs
+    
+    
+    
+    fSuits['hearts'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, 1)
+    fSuits['tiles'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, 2)
+    fSuits['clovers'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, 3)
+    fSuits['pikes'] = fuzz.gbellmf(fSuits.universe, 0.025, 0.95, 4)
+    # fPoints.automf(5)
+    
+    
+    
+    orderedFInput = list(fSuits.terms.values())
+    
+    
+    
+    
+    orderedFOutput = list(fPoints.terms.values())
+    
+    
+    
+    
+    
+    rulez=[]
+    for i,name in enumerate(orderedFInput):
+        if any(i==x for x in prefered):
+            rulez.append(ctrl.Rule(orderedFInput[i], orderedFOutput[3]))
+            print(i)
+        else:
+            rulez.append(ctrl.Rule(orderedFInput[i], orderedFOutput[0]))
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    rule1 = ctrl.Rule(fSuits['hearts'], orderedFOutput[0])
+    rule2 = ctrl.Rule(fSuits['tiles'], orderedFOutput[0])
+    rule3 = ctrl.Rule(fSuits['clovers'], orderedFOutput[0])
+    rule4 = ctrl.Rule(fSuits['pikes'], orderedFOutput[0])
+    
+    rules = [rule1, rule2, rule3, rule4]
+    
+    
+    
+    
+    
+    suitsPreferencesRulebase = ctrl.ControlSystem(rulez)
+    
+    
+        
+    
+        
+        
+        
+        
+    
+        
+    suitsPreferences = ctrl.ControlSystemSimulation(suitsPreferencesRulebase)
+    
+    
+    
+    
+    
+    
+    for i in range(1,5):
+    
+        
+        
+        
+        suitsPreferences.input['fSuits'] = i
+        suitsPreferences.compute()
+        
+        
+        PreferencePoints[i] = int(suitsPreferences.output['fPoints'])
+
+    return
+
+
+
+
+
+def save_preferences_and_close_window():
+    global prefered
+    preferedLocal = []
+    for i in range(0,4):
+        if box_preferences_counter[i].get() == 1:
+            preferedLocal = preferedLocal +[i]
+    prefered = list(set(preferedLocal))        
+    window.destroy()
+    return
+
+
+
+def save_preferences_and_close_window_and_calculate_fuzzy_scope():
+    global prefered
+    preferedLocal = []
+    for i in range(0,4):
+        if box_preferences_counter[i].get() == 1:
+            preferedLocal = preferedLocal +[i]
+    prefered = list(set(preferedLocal))        
+    window.destroy()
+    calculate_fuzzy_scope()
+    return
+
+
+
+
+def create_window():
+    global window
+    window = tk.Toplevel(MainWindow)
+    labelTitle = tk.Label(window, text="Preferences").grid(row=0, column=2)
+    
+    
+    labelNum9 = tk.Label(window, text="Hearts").grid(row=1, column=0)
+    
+    labelNum10 = tk.Label(window, text="Tiles").grid(row=2, column=0)
+    
+    labelNumJ = tk.Label(window, text="Clovers").grid(row=3, column=0)
+    
+    labelNumQ = tk.Label(window, text="Pikes").grid(row=4, column=0)
+    
+
+    
+    
+    for i,name in enumerate(box_preferences_counter):
+        maximum=1
+    
+        entryNumH9 = tk.Entry(window, textvariable=name, width = 4).grid(row=i+1, column=2)
+
+        buttonCal = tk.Button(window, text="+", command=lambda name=name:add(name,maximum)).grid(row=i+1, column=3)
+        buttonCal = tk.Button(window, text="-", command=lambda name = name:sub(name)).grid(row=i+1, column=4)
+
+
+    
+    
+    buttonCal = tk.Button(window, text="save&quit", command=save_preferences_and_close_window_and_calculate_fuzzy_scope).grid(row=5, column=2)
+
+    return 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -946,22 +1226,16 @@ labelTitle = tk.Label(MainWindow, text="Hearts").grid(row=0, column=2)
 
 
 labelNum9 = tk.Label(MainWindow, text="9").grid(row=1, column=0)
-nineEntry = tk.Entry(MainWindow)
 
 labelNum10 = tk.Label(MainWindow, text="10").grid(row=2, column=0)
-HtenEntry = tk.Entry(MainWindow)
 
 labelNumJ = tk.Label(MainWindow, text="J").grid(row=3, column=0)
-HjackEntry = tk.Entry(MainWindow)
 
 labelNumQ = tk.Label(MainWindow, text="Q").grid(row=4, column=0)
-HquuenEntry = tk.Entry(MainWindow)
 
 labelNumK = tk.Label(MainWindow, text="K").grid(row=5, column=0)
-HkingEntry = tk.Entry(MainWindow)
 
 labelNumA = tk.Label(MainWindow, text="A").grid(row=6, column=0)
-HaceEntry = tk.Entry(MainWindow)
 
 
 ##############################
@@ -975,22 +1249,16 @@ labelTitle = tk.Label(MainWindow, text="TILES").grid(row=0, column=2 + SHIFTBETW
 
 
 labelNum9 = tk.Label(MainWindow, text="9").grid(row=1, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
-TnineEntry = tk.Entry(MainWindow)
 
 labelNum10 = tk.Label(MainWindow, text="10").grid(row=2, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES )
-TtenEntry = tk.Entry(MainWindow)
 
 labelNumJ = tk.Label(MainWindow, text="J").grid(row=3, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES) 
-TjackEntry = tk.Entry(MainWindow)
 
 labelNumQ = tk.Label(MainWindow, text="Q").grid(row=4, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
-TquuenEntry = tk.Entry(MainWindow)
 
 labelNumK = tk.Label(MainWindow, text="K").grid(row=5, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
-TkingEntry = tk.Entry(MainWindow)
 
 labelNumA = tk.Label(MainWindow, text="A").grid(row=6, column=0 + SHIFTBETWEENCARDS + SHIFTADJUSTMENT, padx = PADXBETWEENCARDNAMES)
-TaceEntry = tk.Entry(MainWindow)
 
 
 ##############################
@@ -1064,7 +1332,6 @@ labelTitle = tk.Label(MainWindow, text="Random Cards Amount").grid(row=0, column
 
 
 
-labelTitle = tk.Label(MainWindow, text="Combo checking").grid(row=0, column=2 + SHIFTBETWEENCARDS * 5)
 
 
 
@@ -1085,7 +1352,7 @@ labelTitle = tk.Label(MainWindow, text="Possible hands check").grid(row=0, colum
 
 
 
-labelTitle = tk.Label(MainWindow, text="++ as update left cards").grid(row=0, column=2 + SHIFTBETWEENCARDS * 8)
+labelTitle = tk.Label(MainWindow, text="++ as multitask").grid(row=0, column=2 + SHIFTBETWEENCARDS * 5)
 
 
 
@@ -1099,6 +1366,7 @@ labelTitle = tk.Label(MainWindow, text="++ as update left cards").grid(row=0, co
 
 
 
+labelTitle = tk.Label(MainWindow, text="Combo checking").grid(row=0, column=2 + SHIFTBETWEENCARDS * 8)
 
 
 
@@ -1335,19 +1603,12 @@ pick_random_card_from_left_cards = partial(pick_random_card_from_left_cards, car
 
 
 
-########### BUTTONS RESPONSIBLE FOR LOGIC AND POINTS
+########### BUTTONS RESPONSIBLE FOR LOGIC AND POINTS RIGHT PANEL
 
 
+buttonCal = tk.Button(MainWindow, text="Update++ cards", command=lambda:update_hand_and_left_cards()).grid(row=2, column=2 + SHIFTBETWEENCARDS * 5)
 
-buttonCal = tk.Button(MainWindow, text="single", command=lambda:show_single_points(calculate_single_points(hand))).grid(row=1, column=2 + SHIFTBETWEENCARDS * 5)
-
-buttonCal = tk.Button(MainWindow, text="pair", command=lambda:show_pair_points(calculate_pair_points(hand))).grid(row=2, column=2 + SHIFTBETWEENCARDS * 5)
-
-
-buttonCal = tk.Button(MainWindow, text="doublepair", command=lambda:show_double_pair_points(calculate_double_pair_points(hand))).grid(row=3, column=2 + SHIFTBETWEENCARDS * 5)
-
-buttonCal = tk.Button(MainWindow, text="trio", command=lambda:show_trio_points(calculate_trio_points(hand))).grid(row=4, column=2 + SHIFTBETWEENCARDS * 5)
-
+buttonCal = tk.Button(MainWindow, text="Random++ hand", command=lambda:random_hand_and_update_left_cards(RANDOMDRAWAMOUNT)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 5)
 
 
 buttonCal = tk.Button(MainWindow, text="Update left cards", command=lambda:update_left_cards_in_deck()).grid(row=2, column=2 + SHIFTBETWEENCARDS * 6)
@@ -1382,9 +1643,75 @@ buttonCal = tk.Button(MainWindow, text="Show possible hands++", command=lambda:s
 
 
 
-buttonCal = tk.Button(MainWindow, text="Update++ cards", command=lambda:update_hand_and_left_cards()).grid(row=2, column=2 + SHIFTBETWEENCARDS * 8)
 
-buttonCal = tk.Button(MainWindow, text="Random++ hand", command=lambda:random_hand_and_update_left_cards(RANDOMDRAWAMOUNT)).grid(row=3, column=2 + SHIFTBETWEENCARDS * 9)
+
+buttonCal = tk.Button(MainWindow, text="single", command=lambda:show_single_points(calculate_single_points(hand))).grid(row=1, column=2 + SHIFTBETWEENCARDS * 8)
+
+buttonCal = tk.Button(MainWindow, text="pair", command=lambda:show_pair_points(calculate_pair_points(hand))).grid(row=2, column=2 + SHIFTBETWEENCARDS * 8)
+
+
+buttonCal = tk.Button(MainWindow, text="doublepair", command=lambda:show_double_pair_points(calculate_double_pair_points(hand))).grid(row=3, column=2 + SHIFTBETWEENCARDS * 8)
+
+buttonCal = tk.Button(MainWindow, text="trio", command=lambda:show_trio_points(calculate_trio_points(hand))).grid(row=4, column=2 + SHIFTBETWEENCARDS * 8)
+
+
+############################3 DOWN PANEL
+
+labelTitle = tk.Label(MainWindow, text="User actions").grid(row=7, column=0)
+
+
+
+buttonCal = tk.Button(MainWindow, text="Random cards", command=pick_random_card_from_left_cards).grid(row=7, column=2 )
+
+
+
+buttonCal = tk.Button(MainWindow, text="Random++ hand", command=lambda:random_hand_and_update_left_cards(RANDOMDRAWAMOUNT)).grid(row=7, column=2 + SHIFTBETWEENCARDS )
+
+labelTitle = tk.Label(MainWindow, text="or").grid(row=7, column=2 + SHIFTBETWEENCARDS * 1 + 1)
+
+
+
+buttonCal = tk.Button(MainWindow, text="Update++ hand", command=lambda:update_hand_and_left_cards()).grid(row=7, column=2 + SHIFTBETWEENCARDS * 1 + 3)
+
+
+
+
+b = tk.Button(MainWindow, text="Preferences settings", command=lambda:create_window()).grid(row=7,column=2+ 2 * SHIFTBETWEENCARDS)
+
+
+
+
+buttonCal = tk.Button(MainWindow, text="Show possible hands++", command=lambda:show_possible_hands_as_button_with_points(hand,pickedRandomCards,6)).grid(row=7, column=2 + 4*SHIFTBETWEENCARDS )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
